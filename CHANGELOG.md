@@ -1,0 +1,121 @@
+# 更新日志 | Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [2.0.0] - 2024-11-03
+
+### ✨ Added | 新增
+- 📱 完整的移动端响应式支持 - Complete mobile responsive design
+- 🎨 新增 `mobile-responsive.css` 移动端优化样式文件
+- 📖 详尽的中英文 README 文档
+- 🚀 快速启动脚本 (start.sh / start.bat)
+- 📄 LICENSE 文件 (MIT)
+- 🙈 .gitignore 文件
+- 📝 中文使用说明 (README_CN.md)
+
+### 🔧 Changed | 改进
+- 📱 优化 viewport meta 标签，支持真正的响应式
+  - 从 `user-scalable=no` 改为 `width=device-width, initial-scale=1.0, maximum-scale=5.0`
+- 🌐 添加 lang="zh-CN" 属性
+- 📝 完善 meta 描述和关键词
+- 🎨 增强移动端触摸交互体验
+- 📊 优化小屏幕设备的布局
+
+### 📱 Mobile Optimizations | 移动端优化
+- ✅ 响应式钢琴键盘 - 自动适配屏幕宽度
+- ✅ 触摸优化 - 支持多点触控和滑动
+- ✅ 横屏支持 - 自动调整布局
+- ✅ iOS 安全区域适配
+- ✅ 深色模式支持
+- ✅ 触摸反馈优化
+- ✅ 可访问性增强
+
+### 🎯 Browser Support | 浏览器支持
+- ✅ Chrome/Edge ≥ 60
+- ✅ Firefox ≥ 55
+- ✅ Safari ≥ 11
+- ✅ iOS Safari ≥ 11
+- ✅ Android Chrome ≥ 60
+
+### 📐 Responsive Breakpoints | 响应式断点
+- 📱 手机: ≤ 480px
+- 📱 大屏手机: 481px - 768px
+- 📱 平板: 769px - 1024px
+- 💻 桌面: > 1024px
+
+### 🎨 CSS Improvements | CSS 改进
+```css
+/* 移动端优化 */
+- 触摸区域最小 44x44px (符合 WCAG 标准)
+- 流畅的触摸动画
+- 优化的字体大小
+- 自适应的间距和边距
+- 横屏模式专属样式
+```
+
+### 📚 Documentation | 文档
+- 📖 完整的项目说明
+- 🎹 详细的使用指南
+- 🛠️ 技术栈介绍
+- 🔧 自定义配置说明
+- 🤝 贡献指南
+- 📞 联系方式
+
+### 🔍 SEO Improvements | SEO 优化
+- 添加 meta description
+- 添加 meta keywords
+- 添加 theme-color
+- 优化页面标题
+
+---
+
+## [1.0.0] - Original Release
+
+### Features | 原始功能
+- 🎹 钢琴键盘弹奏 - Piano keyboard playing
+- 🎵 Tone.js 音频引擎 - Tone.js audio engine
+- 🎼 MIDI 文件播放 - MIDI file playback
+- 📜 曲谱自动演奏 - Automatic score playback
+- 📝 手动练习模式 - Manual practice mode
+- 🎨 随机壁纸切换 - Random wallpaper switching
+- 💝 捐赠和分享功能 - Donation and sharing features
+
+### Included Content | 包含内容
+- 🎵 15+ 内置曲谱 - 15+ built-in scores
+- 🎹 88 键钢琴音频采样 - 88-key piano samples
+- 🖼️ 6 张精美壁纸 - 6 beautiful wallpapers
+- 🎼 2 个 MIDI 演示文件 - 2 MIDI demo files
+
+---
+
+## Future Plans | 未来计划
+
+### 🚀 Version 2.1.0 (计划中)
+- [ ] PWA 支持 - 可离线使用
+- [ ] 更多曲谱 - 持续添加
+- [ ] 录音功能 - 记录演奏
+- [ ] 乐谱编辑器 - 自定义曲谱
+- [ ] 多语言支持 - 国际化
+- [ ] 性能仪表板 - 显示延迟和性能指标
+
+### 🎯 Version 3.0.0 (远期)
+- [ ] WebRTC 实时合奏
+- [ ] AI 辅助练习
+- [ ] 云端曲谱库
+- [ ] 社区功能
+- [ ] 学习进度追踪
+- [ ] VR/AR 支持
+
+---
+
+## Contributing | 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+See [README.md](README.md) for contribution guidelines.
+
+---
+
+## License | 许可证
+
+MIT License - See [LICENSE](LICENSE) for details.

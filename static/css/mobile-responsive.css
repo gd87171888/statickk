@@ -1,0 +1,357 @@
+/* 移动端响应式优化样式 - Mobile Responsive Enhancements */
+
+/* 基础响应式设置 */
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+}
+
+/* 移动端基础样式 */
+@media screen and (max-width: 768px) {
+    body, html {
+        overflow-x: hidden;
+        overflow-y: auto;
+        font-size: 14px;
+    }
+
+    #app {
+        min-width: 100%;
+        width: 100vw;
+        overflow-x: hidden;
+    }
+
+    /* 响应式容器 */
+    .responsive-section-a {
+        width: 95% !important;
+        padding: 0 10px;
+    }
+
+    /* 钢琴键盘区域 */
+    .component-autopiano {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .piano-wrap {
+        min-width: 100%;
+        transform-origin: left top;
+    }
+
+    .piano-band {
+        height: 35px !important;
+        line-height: 35px !important;
+        background-size: 100px 35px !important;
+        font-size: 12px;
+    }
+
+    /* 钢琴键 */
+    .piano-key {
+        min-width: 30px;
+        height: 120px;
+    }
+
+    .piano-key.black {
+        height: 80px;
+        width: 20px;
+    }
+
+    /* 控制按钮区域 */
+    .control-panel {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .control-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        min-width: auto;
+    }
+
+    /* 曲谱列表 */
+    .score-list {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .score-item {
+        padding: 12px;
+        margin: 8px 0;
+    }
+
+    /* 商品卡片 */
+    .commodity-list {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
+
+    .commodity-item {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .commodity-img {
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+        object-fit: cover;
+    }
+
+    /* 页面头部 */
+    .page-header {
+        padding: 10px;
+        flex-wrap: wrap;
+    }
+
+    .page-header .menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .page-header .menu-item {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    /* 页面底部 */
+    .page-footer {
+        padding: 15px 10px;
+        font-size: 12px;
+    }
+
+    /* 歌词显示 */
+    .random-lyric {
+        font-size: 16px;
+        padding: 15px;
+        line-height: 1.6;
+    }
+
+    /* 抽屉组件 */
+    .drawer {
+        width: 90% !important;
+        max-width: 320px;
+    }
+
+    /* 二维码 */
+    .qrcode-wrapper {
+        width: 80%;
+        max-width: 200px;
+        margin: 10px auto;
+    }
+
+    /* 图标调整 */
+    .icon-piano,
+    .icon-alipay,
+    .icon-wxpay {
+        width: 48px;
+        height: 48px;
+        background-size: 48px 48px;
+    }
+
+    .icon-cherry,
+    .icon-heartbeat,
+    .icon-hot,
+    .icon-pause,
+    .icon-star {
+        width: 24px;
+        height: 24px;
+        background-size: 24px 24px;
+    }
+
+    /* 社交分享 */
+    .social-share {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .social-share-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+        line-height: 28px;
+    }
+}
+
+/* 小屏幕手机 (<= 480px) */
+@media screen and (max-width: 480px) {
+    body, html {
+        font-size: 12px;
+    }
+
+    .responsive-section-a {
+        width: 98% !important;
+        padding: 0 5px;
+    }
+
+    .piano-key {
+        min-width: 25px;
+        height: 100px;
+    }
+
+    .piano-key.black {
+        height: 65px;
+        width: 16px;
+    }
+
+    .piano-band {
+        height: 30px !important;
+        line-height: 30px !important;
+        font-size: 11px;
+    }
+
+    .control-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .page-header .menu-item {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .random-lyric {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+/* 平板设备 (768px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .responsive-section-a {
+        width: 90% !important;
+    }
+
+    .commodity-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .score-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 横屏模式优化 */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .piano-wrap {
+        height: 80vh;
+    }
+
+    .page-header {
+        padding: 5px;
+    }
+
+    .random-lyric {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .control-panel {
+        padding: 5px;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .piano-key:active {
+        transform: scale(0.95);
+        transition: transform 0.05s ease;
+    }
+
+    .control-btn:active {
+        opacity: 0.7;
+        transform: scale(0.98);
+    }
+
+    .score-item:active {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    /* 增大可点击区域 */
+    .clickable {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    button,
+    .btn,
+    a {
+        min-width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .icon-piano,
+    .icon-alipay,
+    .icon-wxpay,
+    .icon-cherry,
+    .icon-heartbeat,
+    .icon-hot,
+    .icon-pause,
+    .icon-star {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+    body, html {
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+    }
+
+    .piano-key {
+        background-color: #f5f5f5;
+        border-color: #ccc;
+    }
+
+    .piano-key.black {
+        background-color: #2a2a2a;
+    }
+
+    .control-panel,
+    .score-item,
+    .commodity-item {
+        background-color: #2a2a2a;
+        border-color: #404040;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .page-header,
+    .page-footer,
+    .control-panel,
+    .social-share {
+        display: none;
+    }
+
+    .piano-wrap {
+        page-break-inside: avoid;
+    }
+}
+
+/* 可访问性增强 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* iOS安全区域适配 */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+}
