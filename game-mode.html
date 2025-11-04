@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="钢琴节奏游戏 - 类似 Synthesia 和 Piano Tiles 的落键音游">
+    <meta name="theme-color" content="#6A0DAD">
+    <title>🎮 钢琴节奏游戏 - 落键挑战</title>
+    <link rel="shortcut icon" href="./favicon.png">
+    <link href="./static/css/share.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        .game-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 顶部状态栏 */
+        .game-header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .score-display {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            display: block;
+        }
+
+        .score-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .combo-value {
+            color: #FF6B6B;
+        }
+
+        .accuracy-value {
+            color: #51CF66;
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        /* 进度条 */
+        .progress-container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+        }
+
+        .progress-bar-wrapper {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* 游戏画布区域 */
+        .game-canvas-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        /* 判定反馈 */
+        .judgment-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            pointer-events: none;
+            z-index: 50;
+            animation: judgmentPop 0.5s ease-out;
+            opacity: 0;
+        }
+
+        @keyframes judgmentPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .judgment-perfect {
+            color: #FFD700;
+            text-shadow: 0 0 30px #FFD700;
+        }
+
+        .judgment-good {
+            color: #51CF66;
+            text-shadow: 0 0 30px #51CF66;
+        }
+
+        .judgment-miss {
+            color: #FF6B6B;
+            text-shadow: 0 0 30px #FF6B6B;
+        }
+
+        /* 虚拟钢琴键盘 */
+        .virtual-piano {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+        }
+
+        .piano-keys {
+            display: flex;
+            position: relative;
+            height: 150px;
+        }
+
+        .piano-key {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.1s;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-size: 0.9em;
+            font-weight: bold;
+            border: 2px solid rgba(0,0,0,0.3);
+        }
+
+        .white-key {
+            width: 50px;
+            height: 150px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%);
+            border-radius: 0 0 5px 5px;
+            color: #666;
+            z-index: 1;
+        }
+
+        .white-key:hover {
+            background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 100%);
+        }
+
+        .white-key.active {
+            background: linear-gradient(to bottom, #FFD700 0%, #FFA500 100%);
+            transform: translateY(3px);
+            box-shadow: 0 0 20px rgba(255,215,0,0.8);
+        }
+
+        .black-key {
+            width: 30px;
+            height: 100px;
+            background: linear-gradient(to bottom, #333 0%, #000 100%);
+            border-radius: 0 0 3px 3px;
+            color: white;
+            position: absolute;
+            z-index: 2;
+        }
+
+        .black-key:hover {
+            background: linear-gradient(to bottom, #444 0%, #111 100%);
+        }
+
+        .black-key.active {
+            background: linear-gradient(to bottom, #FFD700 0%, #FFA500 100%);
+            transform: translateY(3px);
+            box-shadow: 0 0 20px rgba(255,215,0,0.8);
+        }
+
+        /* 开始界面 */
+        .start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .start-screen h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+
+        .start-screen p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .song-selector {
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .song-selector label {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .song-selector select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            cursor: pointer;
+            color: #333;
+        }
+
+        .difficulty-selector {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .difficulty-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .difficulty-btn:hover {
+            background: rgba(255,215,0,0.3);
+        }
+
+        .difficulty-btn.active {
+            background: #FFD700;
+            color: #333;
+        }
+
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            max-width: 600px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .instructions li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FFD700;
+        }
+
+        /* 结束界面 */
+        .end-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .end-screen.show {
+            display: flex;
+        }
+
+        .end-screen h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+
+        .stats-display {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            min-width: 400px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 1.3em;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .achievements {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .achievement-badge {
+            display: inline-block;
+            background: rgba(255,215,0,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin: 5px;
+            border: 2px solid #FFD700;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .game-header {
+                padding: 10px 15px;
+            }
+
+            .score-display {
+                gap: 15px;
+            }
+
+            .score-value {
+                font-size: 1.3em;
+            }
+
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            .start-screen h1 {
+                font-size: 2em;
+            }
+
+            .piano-keys {
+                height: 120px;
+            }
+
+            .white-key {
+                width: 40px;
+                height: 120px;
+            }
+
+            .black-key {
+                width: 25px;
+                height: 80px;
+            }
+
+            .stats-display {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .judgment-display {
+                font-size: 3em;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            z-index: 300;
+        }
+
+        .spinner {
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid #FFD700;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 300;
+        }
+
+        .back-link a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 8px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .back-link a:hover {
+            background: rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="back-link">
+        <a href="index.html">← 返回主页</a>
+    </div>
+
+    <div class="game-container">
+        <!-- 开始界面 -->
+        <div class="start-screen" id="startScreen">
+            <h1>🎮 钢琴节奏游戏</h1>
+            <p>像玩游戏一样学钢琴！音符从上方落下，在它们到达判定线时按下正确的琴键。</p>
+            
+            <div class="song-selector">
+                <label for="songSelect">🎵 选择歌曲：</label>
+                <select id="songSelect">
+                    <option value="">-- 请选择一首歌曲 --</option>
+                    <option value="简单爱">简单爱 - 周杰伦</option>
+                    <option value="告白气球">告白气球 - 周杰伦</option>
+                    <option value="七里香">七里香 - 周杰伦</option>
+                    <option value="成都">成都 - 赵雷</option>
+                    <option value="纸短情长">纸短情长 - 烟把儿</option>
+                    <option value="千与千寻">千与千寻 - 久石让</option>
+                    <option value="one_summers_day">One Summer's Day</option>
+                    <option value="canon">Canon in D - 卡农</option>
+                </select>
+            </div>
+
+            <div class="difficulty-selector">
+                <button class="difficulty-btn" data-difficulty="easy">简单</button>
+                <button class="difficulty-btn active" data-difficulty="normal">普通</button>
+                <button class="difficulty-btn" data-difficulty="hard">困难</button>
+            </div>
+
+            <div class="instructions">
+                <h3>📖 游戏说明</h3>
+                <ul>
+                    <li>音符会从上方落下，在到达底部判定线时按键</li>
+                    <li>Perfect：时机完美！+100分</li>
+                    <li>Good：不错！+50分</li>
+                    <li>Miss：失误，连击清零</li>
+                    <li>键盘映射：A-L 为白键，W-P 为黑键</li>
+                    <li>也可以直接点击/触摸底部的虚拟钢琴键盘</li>
+                    <li>保持连击获得更高分数！</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary btn-lg" id="startGameBtn" style="font-size:1.5em; padding:20px 50px;" disabled>开始游戏</button>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div class="game-header">
+            <div class="score-display">
+                <div class="score-item">
+                    <span class="score-label">分数</span>
+                    <span class="score-value" id="scoreDisplay">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-label">连击</span>
+                    <span class="score-value combo-value" id="comboDisplay">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-label">准确率</span>
+                    <span class="score-value accuracy-value" id="accuracyDisplay">100%</span>
+                </div>
+            </div>
+            <div class="game-controls">
+                <button class="btn btn-secondary" id="pauseBtn" disabled>暂停</button>
+                <button class="btn btn-danger" id="quitBtn">退出</button>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 / 0</div>
+        </div>
+
+        <div class="game-canvas-wrapper">
+            <canvas id="gameCanvas"></canvas>
+            <div class="judgment-display" id="judgmentDisplay"></div>
+        </div>
+
+        <div class="virtual-piano" id="virtualPiano">
+            <!-- 钢琴键盘将由 JavaScript 动态生成 -->
+        </div>
+
+        <!-- 结束界面 -->
+        <div class="end-screen" id="endScreen">
+            <h2>🎉 游戏结束！</h2>
+            <div class="stats-display">
+                <div class="stat-row">
+                    <span class="stat-label">最终分数</span>
+                    <span class="stat-value" id="finalScore">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">最大连击</span>
+                    <span class="stat-value" id="maxCombo">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">准确率</span>
+                    <span class="stat-value" id="finalAccuracy">0%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Perfect</span>
+                    <span class="stat-value" id="perfectCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Good</span>
+                    <span class="stat-value" id="goodCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Miss</span>
+                    <span class="stat-value" id="missCount">0</span>
+                </div>
+            </div>
+            <div class="achievements" id="achievements"></div>
+            <div style="display:flex; gap:15px;">
+                <button class="btn btn-primary" id="restartBtn">再玩一次</button>
+                <button class="btn btn-secondary" id="changeSongBtn">换首歌</button>
+                <button class="btn btn-danger" id="backHomeBtn">返回主页</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tone.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+    
+    <script>
+        // ==================== 游戏配置 ====================
+        const CONFIG = {
+            easy: {
+                speed: 150,         // 像素/秒
+                perfectWindow: 80,  // ms
+                goodWindow: 150,    // ms
+                noteLimit: 50       // 只取前N个音符
+            },
+            normal: {
+                speed: 200,
+                perfectWindow: 60,
+                goodWindow: 120,
+                noteLimit: 100
+            },
+            hard: {
+                speed: 250,
+                perfectWindow: 40,
+                goodWindow: 100,
+                noteLimit: null     // 全部音符
+            }
+        };
+
+        // 音符到琴键的映射
+        const NOTE_TO_KEY_MAP = {
+            'C4': { lane: 0, isBlack: false, key: 'a', display: 'Do' },
+            'D4': { lane: 1, isBlack: false, key: 's', display: 'Re' },
+            'E4': { lane: 2, isBlack: false, key: 'd', display: 'Mi' },
+            'F4': { lane: 3, isBlack: false, key: 'f', display: 'Fa' },
+            'G4': { lane: 4, isBlack: false, key: 'g', display: 'Sol' },
+            'A4': { lane: 5, isBlack: false, key: 'h', display: 'La' },
+            'B4': { lane: 6, isBlack: false, key: 'j', display: 'Si' },
+            'C5': { lane: 7, isBlack: false, key: 'k', display: 'Do' },
+            'D5': { lane: 8, isBlack: false, key: 'l', display: 'Re' },
+            'C#4': { lane: 0.5, isBlack: true, key: 'w', display: 'C#' },
+            'D#4': { lane: 1.5, isBlack: true, key: 'e', display: 'D#' },
+            'F#4': { lane: 3.5, isBlack: true, key: 't', display: 'F#' },
+            'G#4': { lane: 4.5, isBlack: true, key: 'y', display: 'G#' },
+            'A#4': { lane: 5.5, isBlack: true, key: 'u', display: 'A#' },
+            'C#5': { lane: 7.5, isBlack: true, key: 'o', display: 'C#' },
+            'D#5': { lane: 8.5, isBlack: true, key: 'p', display: 'D#' }
+        };
+
+        // ==================== 游戏状态 ====================
+        let gameState = {
+            isPlaying: false,
+            isPaused: false,
+            startTime: 0,
+            currentTime: 0,
+            score: 0,
+            combo: 0,
+            maxCombo: 0,
+            perfect: 0,
+            good: 0,
+            miss: 0,
+            notes: [],
+            judgedNotes: new Set(),
+            selectedSong: '',
+            difficulty: 'normal',
+            songData: null
+        };
+
+        // ==================== 音频引擎 ====================
+        const sampler = new Tone.Sampler({
+            urls: {
+                C4: "C4.mp3", D4: "D4.mp3", E4: "E4.mp3", F4: "F4.mp3",
+                G4: "G4.mp3", A4: "A4.mp3", B4: "B4.mp3", C5: "C5.mp3", D5: "D5.mp3"
+            },
+            baseUrl: "./static/samples/piano/",
+            onload: () => {
+                console.log('Piano samples loaded');
+            }
+        }).toDestination();
+
+        // ==================== DOM 元素 ====================
+        const startScreen = document.getElementById('startScreen');
+        const endScreen = document.getElementById('endScreen');
+        const songSelect = document.getElementById('songSelect');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const quitBtn = document.getElementById('quitBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const changeSongBtn = document.getElementById('changeSongBtn');
+        const backHomeBtn = document.getElementById('backHomeBtn');
+        
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const comboDisplay = document.getElementById('comboDisplay');
+        const accuracyDisplay = document.getElementById('accuracyDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const judgmentDisplay = document.getElementById('judgmentDisplay');
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const virtualPiano = document.getElementById('virtualPiano');
+
+        // ==================== Canvas 设置 ====================
+        function resizeCanvas() {
+            const wrapper = canvas.parentElement;
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // ==================== 难度选择 ====================
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                gameState.difficulty = btn.dataset.difficulty;
+            });
+        });
+
+        // ==================== 歌曲选择 ====================
+        songSelect.addEventListener('change', (e) => {
+            gameState.selectedSong = e.target.value;
+            startGameBtn.disabled = !gameState.selectedSong;
+        });
+
+        // ==================== 加载歌曲数据 ====================
+        async function loadSongData(songName) {
+            try {
+                const response = await fetch(`./static/xmlscore/${songName}.json`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Failed to load song:', error);
+                alert('加载歌曲失败！');
+                return null;
+            }
+        }
+
+        // ==================== 解析歌曲为游戏音符 ====================
+        function parseSongToNotes(songData, difficulty) {
+            const notes = [];
+            const config = CONFIG[difficulty];
+            let currentTime = 0;
+            
+            // 只取 staff1 voice1 的主旋律
+            songData.measures.forEach(measure => {
+                if (measure.staff1 && measure.staff1.voice1) {
+                    measure.staff1.voice1.forEach(note => {
+                        if (!note.rest && note.noteName && NOTE_TO_KEY_MAP[note.noteName]) {
+                            const mapping = NOTE_TO_KEY_MAP[note.noteName];
+                            notes.push({
+                                pitch: note.noteName,
+                                startTime: currentTime / 1000, // 转换为秒
+                                duration: note.duration / 1000,
+                                lane: mapping.lane,
+                                isBlack: mapping.isBlack,
+                                key: mapping.key,
+                                judged: false,
+                                y: 0 // 渲染位置
+                            });
+                        }
+                        currentTime += note.duration;
+                    });
+                }
+            });
+
+            // 根据难度限制音符数量
+            if (config.noteLimit && notes.length > config.noteLimit) {
+                return notes.slice(0, config.noteLimit);
+            }
+            
+            return notes;
+        }
+
+        // ==================== 生成虚拟钢琴键盘 ====================
+        function generateVirtualPiano() {
+            virtualPiano.innerHTML = '<div class="piano-keys" id="pianoKeys"></div>';
+            const pianoKeys = document.getElementById('pianoKeys');
+            
+            // 白键
+            const whiteKeys = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5'];
+            whiteKeys.forEach(note => {
+                const mapping = NOTE_TO_KEY_MAP[note];
+                const key = document.createElement('div');
+                key.className = 'piano-key white-key';
+                key.dataset.note = note;
+                key.dataset.key = mapping.key;
+                key.innerHTML = `<div>${mapping.display}<br><small>${mapping.key.toUpperCase()}</small></div>`;
+                key.addEventListener('mousedown', () => onKeyPress(note));
+                key.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    onKeyPress(note);
+                });
+                pianoKeys.appendChild(key);
+            });
+
+            // 黑键
+            const blackKeys = [
+                { note: 'C#4', left: 35 },
+                { note: 'D#4', left: 85 },
+                { note: 'F#4', left: 185 },
+                { note: 'G#4', left: 235 },
+                { note: 'A#4', left: 285 },
+                { note: 'C#5', left: 385 },
+                { note: 'D#5', left: 435 }
+            ];
+            
+            blackKeys.forEach(({ note, left }) => {
+                if (NOTE_TO_KEY_MAP[note]) {
+                    const mapping = NOTE_TO_KEY_MAP[note];
+                    const key = document.createElement('div');
+                    key.className = 'piano-key black-key';
+                    key.style.left = left + 'px';
+                    key.dataset.note = note;
+                    key.dataset.key = mapping.key;
+                    key.innerHTML = `<div>${mapping.display}<br><small>${mapping.key.toUpperCase()}</small></div>`;
+                    key.addEventListener('mousedown', () => onKeyPress(note));
+                    key.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        onKeyPress(note);
+                    });
+                    pianoKeys.appendChild(key);
+                }
+            });
+        }
+
+        generateVirtualPiano();
+
+        // ==================== 键盘事件 ====================
+        document.addEventListener('keydown', (e) => {
+            if (!gameState.isPlaying || gameState.isPaused) return;
+            
+            const key = e.key.toLowerCase();
+            // 找到对应的音符
+            for (const [note, mapping] of Object.entries(NOTE_TO_KEY_MAP)) {
+                if (mapping.key === key) {
+                    onKeyPress(note);
+                    break;
+                }
+            }
+        });
+
+        // ==================== 按键处理 ====================
+        function onKeyPress(note) {
+            if (!gameState.isPlaying || gameState.isPaused) return;
+            
+            // 播放声音
+            sampler.triggerAttackRelease(note, '8n');
+            
+            // 视觉反馈
+            highlightKey(note);
+            
+            // 判定
+            judgeNote(note);
+        }
+
+        function highlightKey(note) {
+            const key = document.querySelector(`[data-note="${note}"]`);
+            if (key) {
+                key.classList.add('active');
+                setTimeout(() => key.classList.remove('active'), 200);
+            }
+        }
+
+        // ==================== 音符判定 ====================
+        function judgeNote(pressedNote) {
+            const now = (Date.now() - gameState.startTime) / 1000;
+            const config = CONFIG[gameState.difficulty];
+            
+            // 找到该音符最近的、未判定的 note
+            let closestNote = null;
+            let minDelta = Infinity;
+            
+            for (const note of gameState.notes) {
+                if (note.judged || note.pitch !== pressedNote) continue;
+                
+                const delta = Math.abs(note.startTime - now);
+                const timeWindow = config.goodWindow / 1000;
+                
+                if (delta < timeWindow && delta < minDelta) {
+                    minDelta = delta;
+                    closestNote = note;
+                }
+            }
+            
+            if (!closestNote) return;
+            
+            closestNote.judged = true;
+            gameState.judgedNotes.add(closestNote);
+            
+            const deltaMs = minDelta * 1000;
+            
+            if (deltaMs <= config.perfectWindow) {
+                // Perfect
+                gameState.perfect++;
+                gameState.combo++;
+                gameState.score += 100;
+                showJudgment('PERFECT', 'perfect');
+            } else if (deltaMs <= config.goodWindow) {
+                // Good
+                gameState.good++;
+                gameState.combo++;
+                gameState.score += 50;
+                showJudgment('GOOD', 'good');
+            } else {
+                // Miss
+                gameState.miss++;
+                gameState.combo = 0;
+                showJudgment('MISS', 'miss');
+            }
+            
+            gameState.maxCombo = Math.max(gameState.maxCombo, gameState.combo);
+            updateUI();
+        }
+
+        function showJudgment(text, type) {
+            judgmentDisplay.textContent = text;
+            judgmentDisplay.className = `judgment-display judgment-${type}`;
+            judgmentDisplay.style.opacity = '1';
+            judgmentDisplay.style.animation = 'none';
+            
+            setTimeout(() => {
+                judgmentDisplay.style.animation = 'judgmentPop 0.5s ease-out';
+            }, 10);
+        }
+
+        // ==================== 自动判定 Miss ====================
+        function checkMissedNotes() {
+            const now = (Date.now() - gameState.startTime) / 1000;
+            const config = CONFIG[gameState.difficulty];
+            const missWindow = config.goodWindow / 1000;
+            
+            for (const note of gameState.notes) {
+                if (note.judged) continue;
+                
+                if (now - note.startTime > missWindow) {
+                    note.judged = true;
+                    gameState.judgedNotes.add(note);
+                    gameState.miss++;
+                    gameState.combo = 0;
+                    showJudgment('MISS', 'miss');
+                    updateUI();
+                }
+            }
+        }
+
+        // ==================== 更新 UI ====================
+        function updateUI() {
+            scoreDisplay.textContent = gameState.score;
+            comboDisplay.textContent = gameState.combo;
+            
+            const totalJudged = gameState.perfect + gameState.good + gameState.miss;
+            const accuracy = totalJudged > 0 
+                ? ((gameState.perfect + gameState.good) / totalJudged * 100).toFixed(1)
+                : 100;
+            accuracyDisplay.textContent = accuracy + '%';
+            
+            const progress = totalJudged / gameState.notes.length * 100;
+            progressBar.style.width = progress + '%';
+            progressText.textContent = `${totalJudged} / ${gameState.notes.length}`;
+        }
+
+        // ==================== 游戏循环 ====================
+        function gameLoop() {
+            if (!gameState.isPlaying || gameState.isPaused) return;
+            
+            const now = (Date.now() - gameState.startTime) / 1000;
+            gameState.currentTime = now;
+            
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制判定线
+            const judgeLineY = canvas.height - 150;
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, judgeLineY);
+            ctx.lineTo(canvas.width, judgeLineY);
+            ctx.stroke();
+            
+            // 绘制下落音符
+            const config = CONFIG[gameState.difficulty];
+            const speed = config.speed;
+            const laneWidth = 50;
+            const startX = (canvas.width - laneWidth * 9) / 2;
+            
+            for (const note of gameState.notes) {
+                if (note.judged) continue;
+                
+                const timeDiff = note.startTime - now;
+                const y = judgeLineY - timeDiff * speed;
+                
+                // 只渲染可见范围内的音符
+                if (y < -100 || y > canvas.height) continue;
+                
+                const x = startX + note.lane * laneWidth;
+                const width = note.isBlack ? 30 : 40;
+                const height = Math.max(note.duration * speed, 20);
+                
+                // 绘制音符
+                ctx.fillStyle = note.isBlack 
+                    ? 'rgba(100, 100, 255, 0.9)' 
+                    : 'rgba(255, 100, 150, 0.9)';
+                ctx.shadowColor = note.isBlack ? '#6464ff' : '#ff6496';
+                ctx.shadowBlur = 10;
+                ctx.fillRect(x - width/2, y - height, width, height);
+                ctx.shadowBlur = 0;
+                
+                // 绘制音符名称
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(note.pitch, x, y - height/2);
+            }
+            
+            // 检查漏掉的音符
+            checkMissedNotes();
+            
+            // 检查游戏是否结束
+            if (gameState.judgedNotes.size >= gameState.notes.length) {
+                endGame();
+                return;
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ==================== 开始游戏 ====================
+        startGameBtn.addEventListener('click', async () => {
+            if (!gameState.selectedSong) return;
+            
+            // 加载歌曲数据
+            const songData = await loadSongData(gameState.selectedSong);
+            if (!songData) return;
+            
+            gameState.songData = songData;
+            gameState.notes = parseSongToNotes(songData, gameState.difficulty);
+            
+            if (gameState.notes.length === 0) {
+                alert('这首歌没有可用的音符！');
+                return;
+            }
+            
+            // 重置状态
+            gameState.score = 0;
+            gameState.combo = 0;
+            gameState.maxCombo = 0;
+            gameState.perfect = 0;
+            gameState.good = 0;
+            gameState.miss = 0;
+            gameState.judgedNotes.clear();
+            gameState.isPlaying = true;
+            gameState.isPaused = false;
+            gameState.startTime = Date.now() + 2000; // 2秒准备时间
+            
+            // 隐藏开始界面
+            startScreen.style.display = 'none';
+            pauseBtn.disabled = false;
+            
+            // 启动 Tone.js
+            await Tone.start();
+            
+            // 倒计时
+            let countdown = 3;
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    showJudgment(countdown.toString(), 'perfect');
+                } else if (countdown === 0) {
+                    showJudgment('GO!', 'perfect');
+                    clearInterval(countdownInterval);
+                    updateUI();
+                    gameLoop();
+                }
+            }, 1000);
+        });
+
+        // ==================== 暂停/继续 ====================
+        pauseBtn.addEventListener('click', () => {
+            if (gameState.isPaused) {
+                // 继续
+                gameState.isPaused = false;
+                gameState.startTime += Date.now() - gameState.pauseTime;
+                pauseBtn.textContent = '暂停';
+                gameLoop();
+            } else {
+                // 暂停
+                gameState.isPaused = true;
+                gameState.pauseTime = Date.now();
+                pauseBtn.textContent = '继续';
+            }
+        });
+
+        // ==================== 退出 ====================
+        quitBtn.addEventListener('click', () => {
+            if (gameState.isPlaying && confirm('确定要退出吗？进度将不会保存。')) {
+                endGame(true);
+            }
+        });
+
+        // ==================== 结束游戏 ====================
+        function endGame(isQuit = false) {
+            gameState.isPlaying = false;
+            pauseBtn.disabled = true;
+            
+            if (isQuit) {
+                startScreen.style.display = 'flex';
+                return;
+            }
+            
+            // 显示结束界面
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('maxCombo').textContent = gameState.maxCombo;
+            document.getElementById('perfectCount').textContent = gameState.perfect;
+            document.getElementById('goodCount').textContent = gameState.good;
+            document.getElementById('missCount').textContent = gameState.miss;
+            
+            const totalNotes = gameState.perfect + gameState.good + gameState.miss;
+            const accuracy = totalNotes > 0 
+                ? ((gameState.perfect + gameState.good) / totalNotes * 100).toFixed(1)
+                : 0;
+            document.getElementById('finalAccuracy').textContent = accuracy + '%';
+            
+            // 显示成就
+            const achievements = [];
+            if (accuracy >= 95) achievements.push('🏆 完美演奏');
+            if (gameState.maxCombo >= 50) achievements.push('🔥 连击大师');
+            if (gameState.perfect >= totalNotes * 0.8) achievements.push('⭐ 精准之神');
+            if (gameState.score >= 5000) achievements.push('💎 高分达人');
+            
+            const achievementsDiv = document.getElementById('achievements');
+            if (achievements.length > 0) {
+                achievementsDiv.innerHTML = '<h3>🎖️ 成就解锁</h3>' + 
+                    achievements.map(a => `<div class="achievement-badge">${a}</div>`).join('');
+            } else {
+                achievementsDiv.innerHTML = '';
+            }
+            
+            // 保存最高分
+            const storageKey = `highscore_${gameState.selectedSong}_${gameState.difficulty}`;
+            const highScore = localStorage.getItem(storageKey) || 0;
+            if (gameState.score > highScore) {
+                localStorage.setItem(storageKey, gameState.score);
+            }
+            
+            endScreen.classList.add('show');
+        }
+
+        // ==================== 重新开始 ====================
+        restartBtn.addEventListener('click', () => {
+            endScreen.classList.remove('show');
+            startGameBtn.click();
+        });
+
+        // ==================== 换首歌 ====================
+        changeSongBtn.addEventListener('click', () => {
+            endScreen.classList.remove('show');
+            startScreen.style.display = 'flex';
+            gameState.isPlaying = false;
+        });
+
+        // ==================== 返回主页 ====================
+        backHomeBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

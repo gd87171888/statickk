@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2024-11-04
+
+### 🎮 Added | 新增
+- **游戏模式 (Game Mode)** - 全新的节奏游戏体验！
+  - 独立页面 `game-mode.html`
+  - 类似 Synthesia 和 Piano Tiles 的落键游戏
+  - 音符从上方落下，在判定线处按键
+  - 精准判定系统：Perfect / Good / Miss
+  - 三种难度选择：简单、普通、困难
+  - 实时显示：分数、连击、准确率
+  - 完整的进度条显示
+  - 成就系统：完美演奏、连击大师、精准之神、高分达人
+  - 本地最高分记录（localStorage）
+  - 游戏结束统计：最终分数、最大连击、准确率、各判定数量
+  - 支持键盘和触控操作
+  - 虚拟钢琴键盘（可点击/触摸）
+  - 使用 Canvas 进行高性能渲染
+  - 完全响应式设计，支持移动端
+  - 漂亮的游戏UI和动画效果
+  - 8首内置歌曲支持
+
+### 🎨 UI/UX Improvements | 界面改进
+- 🎯 清晰的判定反馈（金色Perfect、绿色Good、红色Miss）
+- ✨ 流畅的音符下落动画
+- 🌟 按键高亮效果和视觉反馈
+- 📊 实时更新的游戏统计
+- 🏆 精美的成就徽章显示
+- 🎭 沉浸式的游戏界面
+
+### 📚 Documentation | 文档更新
+- 📖 新增 `GAME-MODE-GUIDE.md` - 游戏模式完整使用指南
+- 📝 更新 README.md - 添加游戏模式说明
+- 💡 详细的游戏规则、技巧和常见问题
+
+### 🔧 Technical Details | 技术细节
+- Canvas 2D 渲染引擎
+- requestAnimationFrame 游戏循环
+- Tone.js 音频引擎集成
+- 精确的时间同步机制
+- localStorage 数据持久化
+- 动态难度配置系统
+
 ## [2.1.0] - 2024-11-04
 
 ### ✨ Added | 新增
