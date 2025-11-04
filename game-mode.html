@@ -530,7 +530,6 @@
             </button>
             <ul class="main-nav-menu">
                 <li><a href="./index.html">🏠 主页</a></li>
-                <li><a href="./follow-along.html">📚 跟弹模式</a></li>
                 <li><a href="./game-mode.html" class="active">🎮 游戏模式</a></li>
             </ul>
         </div>
@@ -552,8 +551,14 @@
                     <option value="成都">成都 - 赵雷</option>
                     <option value="纸短情长">纸短情长 - 烟把儿</option>
                     <option value="千与千寻">千与千寻 - 久石让</option>
-                    <option value="one_summers_day">One Summer's Day</option>
+                    <option value="one_summers_day">One Summer's Day - 久石让</option>
                     <option value="canon">Canon in D - 卡农</option>
+                    <option value="后来">后来 - 刘若英</option>
+                    <option value="时间煮雨">时间煮雨 - 吴亦凡</option>
+                    <option value="蒲公英的约定">蒲公英的约定 - 周杰伦</option>
+                    <option value="下一个天亮">下一个天亮 - 郭静</option>
+                    <option value="海角七号">海角七号</option>
+                    <option value="牢不可破的联盟">牢不可破的联盟</option>
                 </select>
             </div>
 
@@ -781,18 +786,48 @@
         // ==================== 加载歌曲数据 ====================
         async function loadSongData(songName) {
             try {
-                const response = await fetch(`./static/xmlscore/${songName}.json`);
+                const url = `./static/xmlscore/${songName}.json`;
+                console.log(`🎵 Loading song: ${songName}`);
+                console.log(`📁 URL: ${url}`);
+                
+                const response = await fetch(url);
+                console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+                
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
+                
                 const data = await response.json();
+                
                 if (!data || !data.measures) {
-                    throw new Error('Invalid song data format');
+                    throw new Error('文件格式不正确：缺少 measures 数据');
                 }
+                
+                console.log(`✅ Song loaded successfully!`);
+                console.log(`📊 Measures: ${data.measures.length}`);
+                console.log(`🎼 Music: ${data.musicName || songName}`);
+                
                 return data;
             } catch (error) {
-                console.error('Failed to load song:', error);
-                alert(`加载歌曲失败！\n错误：${error.message}\n请检查歌曲文件是否存在。`);
+                console.error('❌ Failed to load song:', error);
+                console.error('Song name:', songName);
+                
+                let errorMsg = '加载歌曲失败！\n\n';
+                
+                if (error.message.includes('HTTP 404')) {
+                    errorMsg += `歌曲文件不存在：${songName}.json\n`;
+                    errorMsg += '请确认文件在 static/xmlscore/ 目录下。';
+                } else if (error.message.includes('JSON')) {
+                    errorMsg += '歌曲文件格式错误\n';
+                    errorMsg += 'JSON 解析失败，请检查文件内容。';
+                } else if (error.message.includes('measures')) {
+                    errorMsg += '歌曲数据格式不正确\n';
+                    errorMsg += '文件中缺少必要的 measures 数据。';
+                } else {
+                    errorMsg += `错误信息：${error.message}`;
+                }
+                
+                alert(errorMsg);
                 return null;
             }
         }
@@ -802,34 +837,58 @@
             const notes = [];
             const config = CONFIG[difficulty];
             let currentTime = 0;
+            let totalNotes = 0;
+            let supportedNotes = 0;
+            let unsupportedNotes = [];
+            
+            console.log(`🎹 Parsing song for difficulty: ${difficulty}`);
+            console.log(`⚙️ Config:`, config);
             
             // 只取 staff1 voice1 的主旋律
-            songData.measures.forEach(measure => {
+            songData.measures.forEach((measure, measureIndex) => {
                 if (measure.staff1 && measure.staff1.voice1) {
                     measure.staff1.voice1.forEach(note => {
-                        if (!note.rest && note.noteName && NOTE_TO_KEY_MAP[note.noteName]) {
-                            const mapping = NOTE_TO_KEY_MAP[note.noteName];
-                            notes.push({
-                                pitch: note.noteName,
-                                startTime: currentTime / 1000, // 转换为秒
-                                duration: note.duration / 1000,
-                                lane: mapping.lane,
-                                isBlack: mapping.isBlack,
-                                key: mapping.key,
-                                judged: false,
-                                y: 0 // 渲染位置
-                            });
+                        if (!note.rest && note.noteName) {
+                            totalNotes++;
+                            
+                            if (NOTE_TO_KEY_MAP[note.noteName]) {
+                                const mapping = NOTE_TO_KEY_MAP[note.noteName];
+                                notes.push({
+                                    pitch: note.noteName,
+                                    startTime: currentTime / 1000, // 转换为秒
+                                    duration: note.duration / 1000,
+                                    lane: mapping.lane,
+                                    isBlack: mapping.isBlack,
+                                    key: mapping.key,
+                                    judged: false,
+                                    y: 0 // 渲染位置
+                                });
+                                supportedNotes++;
+                            } else {
+                                // 记录不支持的音符
+                                if (!unsupportedNotes.includes(note.noteName)) {
+                                    unsupportedNotes.push(note.noteName);
+                                }
+                            }
                         }
                         currentTime += note.duration;
                     });
                 }
             });
 
+            console.log(`📊 Total notes in song: ${totalNotes}`);
+            console.log(`✅ Supported notes (C4-D5): ${supportedNotes}`);
+            if (unsupportedNotes.length > 0) {
+                console.log(`⚠️ Unsupported notes (skipped): ${unsupportedNotes.join(', ')}`);
+            }
+
             // 根据难度限制音符数量
             if (config.noteLimit && notes.length > config.noteLimit) {
+                console.log(`✂️ Limiting notes from ${notes.length} to ${config.noteLimit}`);
                 return notes.slice(0, config.noteLimit);
             }
             
+            console.log(`🎯 Final note count: ${notes.length}`);
             return notes;
         }
 
@@ -1089,33 +1148,47 @@
 
         // ==================== 开始游戏 ====================
         startGameBtn.addEventListener('click', async () => {
-            if (!gameState.selectedSong) return;
+            if (!gameState.selectedSong) {
+                alert('请先选择一首歌曲！');
+                return;
+            }
+            
+            console.log('='.repeat(60));
+            console.log('🎮 Starting Game Mode');
+            console.log('='.repeat(60));
             
             // 显示加载提示
             startGameBtn.disabled = true;
-            startGameBtn.textContent = '加载中...';
+            startGameBtn.textContent = '⏳ 加载中...';
             
             // 加载歌曲数据
-            console.log(`Loading song: ${gameState.selectedSong}`);
             const songData = await loadSongData(gameState.selectedSong);
             
             // 恢复按钮状态
             startGameBtn.disabled = false;
-            startGameBtn.textContent = '开始游戏 🚀';
+            startGameBtn.textContent = '开始游戏';
             
-            if (!songData) return;
+            if (!songData) {
+                console.log('❌ Song loading failed, aborting game start');
+                return;
+            }
             
-            console.log(`Song loaded successfully. Measures: ${songData.measures?.length || 0}`);
-            
+            // 解析音符
             gameState.songData = songData;
             gameState.notes = parseSongToNotes(songData, gameState.difficulty);
             
-            console.log(`Parsed ${gameState.notes.length} notes from song`);
-            
             if (gameState.notes.length === 0) {
-                alert('这首歌没有可用的音符！\n可能是音符范围超出了 C4-D5 的范围。');
+                console.log('❌ No playable notes found');
+                alert('这首歌没有可用的音符！\n\n' +
+                      '可能原因：\n' +
+                      '1. 音符范围超出了 C4-D5\n' +
+                      '2. 歌曲只有休止符\n' +
+                      '3. 请尝试选择其他歌曲');
                 return;
             }
+            
+            console.log(`✅ Ready to start! ${gameState.notes.length} notes loaded`);
+            console.log('='.repeat(60));
             
             // 重置状态
             gameState.score = 0;
