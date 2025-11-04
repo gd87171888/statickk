@@ -35,9 +35,31 @@
         </nav>
 
         <div id="app"></div>
+        <!-- Tone.js CDN for piano audio -->
+        <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
         <script src="./static/js/jquery3.min.js"></script>
         <script type="text/javascript" src="./static/js/manifest.74ad20caa85e6a4f0cae.js"></script>
         <script type="text/javascript" src="./static/js/vendor.536a3467a2e4c2663434.js"></script>
         <script type="text/javascript" src="./static/js/app.5938dc65d8bdd2d31cf7.js"></script>
+        <!-- Initialize Tone.js audio context on user interaction -->
+        <script>
+        (function() {
+            let audioInitialized = false;
+            function initAudio() {
+                if (!audioInitialized && typeof Tone !== 'undefined') {
+                    Tone.start().then(() => {
+                        console.log('Tone.js audio context initialized');
+                        audioInitialized = true;
+                    }).catch(err => {
+                        console.error('Failed to initialize Tone.js:', err);
+                    });
+                }
+            }
+            // Initialize on first user interaction
+            ['click', 'touchstart', 'keydown'].forEach(event => {
+                document.addEventListener(event, initAudio, { once: true });
+            });
+        })();
+        </script>
     </body>
 </html>
