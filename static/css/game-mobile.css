@@ -60,15 +60,20 @@
         font-size: 0.8em;
     }
 
-    /* Canvas 区域 - 更多空间 */
+    /* Canvas 区域 - 更多空间，确保音符可见 */
     .game-canvas-wrapper {
         flex: 1;
-        min-height: 200px;
+        min-height: 250px !important;
+        max-height: 60vh !important;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.5) !important;
     }
 
     #gameCanvas {
-        width: 100%;
-        height: 100%;
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        touch-action: none;
     }
 
     /* 判定显示 */
@@ -118,19 +123,22 @@
         padding: 1px 3px;
     }
 
-    /* 开始界面 */
+    /* 开始界面 - 确保所有内容可见 */
     .start-screen {
         padding: 15px;
         padding-top: 20px;
-        padding-bottom: 30px;
+        padding-bottom: 60px !important;
         justify-content: flex-start !important;
         overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        display: flex !important;
+        height: 100% !important;
     }
 
     .start-screen h1 {
         font-size: 1.8em;
         margin-bottom: 15px;
-        margin-top: 0;
+        margin-top: 10px;
     }
 
     .start-screen p {
@@ -182,13 +190,21 @@
         font-size: 1.2em !important;
         padding: 15px 35px !important;
         min-height: 50px !important;
-        margin-top: 10px !important;
-        margin-bottom: 20px !important;
+        margin-top: 20px !important;
+        margin-bottom: 40px !important;
+        width: 85% !important;
+        max-width: 350px !important;
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
     
     #startGameBtn {
-        width: 80%;
-        max-width: 300px;
+        width: 85% !important;
+        max-width: 350px !important;
+        font-size: 1.3em !important;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%) !important;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4) !important;
     }
 
     /* 结束界面 */
@@ -279,12 +295,43 @@
         font-size: 2em;
     }
 
+    .start-screen {
+        padding: 10px !important;
+        padding-bottom: 50px !important;
+    }
+
     .start-screen h1 {
         font-size: 1.5em;
     }
 
-    .instructions li {
+    .start-screen p {
+        font-size: 0.9em;
+    }
+
+    .instructions {
         font-size: 0.8em;
+        padding: 10px;
+    }
+
+    .instructions li {
+        font-size: 0.75em;
+    }
+    
+    .btn-lg {
+        font-size: 1.1em !important;
+        padding: 12px 30px !important;
+        min-height: 48px !important;
+        width: 90% !important;
+    }
+    
+    #startGameBtn {
+        width: 90% !important;
+        font-size: 1.2em !important;
+    }
+    
+    .game-canvas-wrapper {
+        min-height: 200px !important;
+        max-height: 50vh !important;
     }
 }
 
@@ -472,22 +519,31 @@
 
     .game-canvas-wrapper {
         flex: 1;
-        min-height: 250px;
+        min-height: 280px !important;
+        max-height: 55vh !important;
     }
 
     .virtual-piano {
         min-height: 110px;
+        max-height: 120px;
     }
 
-    /* 开始界面内容居中 */
+    /* 开始界面内容可见 */
     .start-screen {
-        justify-content: flex-start;
-        overflow-y: auto;
+        justify-content: flex-start !important;
+        overflow-y: auto !important;
+        padding-bottom: 80px !important;
     }
 
     .instructions {
         max-height: 30vh;
         overflow-y: auto;
+        margin-bottom: 20px;
+    }
+    
+    .btn-lg {
+        margin-top: 25px !important;
+        margin-bottom: 50px !important;
     }
 }
 

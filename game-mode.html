@@ -755,14 +755,36 @@
 
         // ==================== 音频引擎 ====================
         let audioInitialized = false;
+        // 使用正确的MIDI编号文件名（a=白键，b=黑键）
+        // 可用文件：a48-a57, a65-a90 (白键), b49-b90 (黑键，部分缺失)
+        // C4=60(缺), D4=62(缺), E4=64(缺), F4=65, G4=67, A4=69, B4=71, C5=72, D5=74
+        // 使用最近的可用音符作为替代
         const sampler = new Tone.Sampler({
             urls: {
-                C4: "C4.mp3", D4: "D4.mp3", E4: "E4.mp3", F4: "F4.mp3",
-                G4: "G4.mp3", A4: "A4.mp3", B4: "B4.mp3", C5: "C5.mp3", D5: "D5.mp3"
+                'C4': 'a65.mp3',  // 用F4代替C4（缺a60）
+                'D4': 'a65.mp3',  // 用F4代替D4（缺a62）
+                'E4': 'a65.mp3',  // 用F4代替E4（缺a64）
+                'F4': 'a65.mp3',
+                'G4': 'a67.mp3',
+                'A4': 'a69.mp3',
+                'B4': 'a71.mp3',
+                'C5': 'a72.mp3',
+                'D5': 'a74.mp3',
+                'C#4': 'b66.mp3',  // 用F#4的半音（缺b61）
+                'D#4': 'b66.mp3',  // 用F#4的半音（缺b63）
+                'F#4': 'b66.mp3',
+                'G#4': 'b68.mp3',
+                'A#4': 'b69.mp3',  // 使用b69（缺b70）
+                'C#5': 'b73.mp3',
+                'D#5': 'b74.mp3'   // 使用b74（缺b75）
             },
             baseUrl: "./static/samples/piano/",
             onload: () => {
                 console.log('🎹 Piano samples loaded successfully');
+                console.log('📝 Note: C4/D4/E4 use F4 sample (files a60-a64 missing)');
+            },
+            onerror: (error) => {
+                console.error('❌ Failed to load piano samples:', error);
             }
         }).toDestination();
         
@@ -811,6 +833,11 @@
             canvas.width = width;
             canvas.height = height;
             
+            // 设置显示大小
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.display = 'block';
+            
             // 如果游戏正在进行，需要重新生成虚拟钢琴以适应新尺寸
             if (gameState.isPlaying || gameState.isPaused) {
                 // 游戏中不重新生成，避免打断游戏
@@ -819,12 +846,13 @@
                 generateVirtualPiano();
             }
             
-            console.log(`Canvas resized: ${width}x${height}`);
+            console.log(`📐 Canvas resized: ${width}x${height}, wrapper: ${wrapper.clientWidth}x${wrapper.clientHeight}`);
         }
         
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
         window.addEventListener('orientationchange', () => {
+            console.log('📱 Screen orientation changed, resizing...');
             setTimeout(resizeCanvas, 100); // 延迟以确保布局已更新
         });
 
@@ -1252,9 +1280,9 @@
             // 确保startX和虚拟钢琴键盘居中位置一致
             const startX = (canvas.width - pianoWidth) / 2;
             
-            // 绘制轨道线（辅助线，方便玩家看清音符轨道）
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 1;
+            // 绘制轨道线（辅助线，方便玩家看清音符轨道） - 增强可见性
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.lineWidth = 2;
             for (let i = 0; i <= totalLanes; i++) {
                 const x = startX + i * laneWidth;
                 ctx.beginPath();
@@ -1262,6 +1290,9 @@
                 ctx.lineTo(x, canvas.height);
                 ctx.stroke();
             }
+            
+            // 统计可见音符数量（调试用）
+            let visibleNotes = 0;
             
             for (const note of gameState.notes) {
                 if (note.judged) continue;
@@ -1272,37 +1303,57 @@
                 // 只渲染可见范围内的音符
                 if (y < -100 || y > canvas.height) continue;
                 
+                visibleNotes++;
+                
                 // 音符中心位置对齐到lane中心
                 const x = startX + note.lane * laneWidth + laneWidth / 2;
                 const width = note.isBlack ? 30 : 40;
                 const height = Math.max(note.duration * speed, 20);
                 
-                // 绘制音符
+                // 绘制音符 - 增强亮度和对比度
                 ctx.fillStyle = note.isBlack 
-                    ? 'rgba(100, 100, 255, 0.9)' 
-                    : 'rgba(255, 100, 150, 0.9)';
-                ctx.shadowColor = note.isBlack ? '#6464ff' : '#ff6496';
-                ctx.shadowBlur = 10;
+                    ? 'rgba(100, 150, 255, 0.95)' 
+                    : 'rgba(255, 120, 170, 0.95)';
+                ctx.shadowColor = note.isBlack ? '#6496ff' : '#ff6496';
+                ctx.shadowBlur = 15;
                 ctx.fillRect(x - width/2, y - height, width, height);
                 ctx.shadowBlur = 0;
                 
+                // 添加边框增强可见性
+                ctx.strokeStyle = note.isBlack ? '#96c8ff' : '#ffc8e0';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x - width/2, y - height, width, height);
+                
                 // 绘制键盘按键提示（更大、更明显）
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 20px Arial';
+                ctx.font = 'bold 22px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
                 // 获取对应的键盘按键
                 const keyMapping = NOTE_TO_KEY_MAP[note.pitch];
                 if (keyMapping) {
-                    // 绘制黄色背景
-                    ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
-                    ctx.fillRect(x - 15, y - height/2 - 12, 30, 24);
+                    // 绘制黄色背景（更大更明显）
+                    ctx.fillStyle = 'rgba(255, 215, 0, 0.95)';
+                    const labelWidth = 32;
+                    const labelHeight = 26;
+                    ctx.fillRect(x - labelWidth/2, y - height/2 - labelHeight/2, labelWidth, labelHeight);
                     
-                    // 绘制按键字母
+                    // 添加黑色边框
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x - labelWidth/2, y - height/2 - labelHeight/2, labelWidth, labelHeight);
+                    
+                    // 绘制按键字母（加粗黑色）
                     ctx.fillStyle = '#000';
+                    ctx.font = 'bold 22px Arial';
                     ctx.fillText(keyMapping.key.toUpperCase(), x, y - height/2);
                 }
+            }
+            
+            // 每60帧输出一次可见音符数量（减少日志）
+            if (Math.floor(now * 60) % 60 === 0) {
+                console.log(`🎵 Visible notes: ${visibleNotes}, Total: ${gameState.notes.length}, Judged: ${gameState.judgedNotes.size}`);
             }
             
             // 检查漏掉的音符
