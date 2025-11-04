@@ -1,0 +1,282 @@
+/* 主页钢琴移动端专属优化 - Piano Mobile Optimization */
+
+/* 移动端基础适配 */
+@media screen and (max-width: 768px) {
+    /* 钢琴容器 */
+    .component-autopiano {
+        width: 100% !important;
+        overflow-x: auto;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px 0;
+    }
+
+    /* 钢琴包装器 */
+    .piano-wrap {
+        min-width: 800px; /* 保持最小宽度让钢琴可以横向滚动 */
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* 钢琴键盘区域 - 增大尺寸方便触摸 */
+    .piano-keyboard {
+        height: 180px !important;
+        position: relative;
+    }
+
+    /* 白键 - 增大尺寸 */
+    .piano-key.white {
+        width: 50px !important;
+        height: 180px !important;
+        font-size: 14px !important;
+    }
+
+    /* 黑键 - 增大尺寸 */
+    .piano-key.black {
+        width: 35px !important;
+        height: 120px !important;
+        font-size: 12px !important;
+    }
+
+    /* 键名显示 */
+    .piano-key .key-name {
+        font-size: 16px !important;
+        font-weight: bold;
+    }
+
+    .piano-key .key-code {
+        font-size: 11px !important;
+        margin-top: 4px;
+    }
+
+    /* 触摸反馈优化 */
+    .piano-key:active {
+        transform: translateY(4px);
+        filter: brightness(0.8);
+    }
+
+    /* 控制面板 */
+    .piano-controls {
+        padding: 12px 10px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .piano-control-btn {
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        min-height: 44px;
+        min-width: 80px;
+    }
+
+    /* 曲谱列表 */
+    .score-list-container {
+        padding: 10px;
+    }
+
+    .score-item {
+        padding: 14px !important;
+        margin: 8px 0 !important;
+        font-size: 15px !important;
+        min-height: 50px;
+    }
+
+    .score-item-title {
+        font-size: 16px !important;
+        font-weight: bold;
+    }
+
+    .score-item-subtitle {
+        font-size: 13px !important;
+        margin-top: 4px;
+    }
+
+    /* MIDI 控制 */
+    .midi-controls {
+        padding: 10px;
+    }
+
+    .midi-control-btn {
+        padding: 10px 14px !important;
+        font-size: 13px !important;
+        min-height: 44px;
+    }
+
+    /* 音量控制 */
+    .volume-control {
+        width: 100%;
+        max-width: 300px;
+        margin: 10px auto;
+    }
+
+    .volume-slider {
+        width: 100%;
+        height: 40px;
+    }
+}
+
+/* 小屏手机 (<= 480px) */
+@media screen and (max-width: 480px) {
+    .piano-wrap {
+        min-width: 700px; /* 稍微减小最小宽度 */
+    }
+
+    .piano-keyboard {
+        height: 160px !important;
+    }
+
+    .piano-key.white {
+        width: 45px !important;
+        height: 160px !important;
+    }
+
+    .piano-key.black {
+        width: 30px !important;
+        height: 110px !important;
+    }
+
+    .piano-control-btn {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+        min-width: 70px;
+    }
+
+    .score-item {
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+}
+
+/* 横屏模式 - 利用更多水平空间 */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .piano-wrap {
+        min-width: 100%; /* 横屏时占满宽度 */
+    }
+
+    .piano-keyboard {
+        height: 140px !important;
+    }
+
+    .piano-key.white {
+        width: calc(100vw / 16) !important; /* 动态计算宽度 */
+        max-width: 60px;
+        height: 140px !important;
+    }
+
+    .piano-key.black {
+        width: calc(100vw / 25) !important;
+        max-width: 40px;
+        height: 100px !important;
+    }
+
+    /* 控制面板横向排列 */
+    .piano-controls {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    /* 减小标题和说明文字 */
+    .page-title {
+        font-size: 20px !important;
+        margin: 8px 0 !important;
+    }
+
+    .random-lyric {
+        font-size: 13px !important;
+        padding: 8px !important;
+    }
+}
+
+/* 竖屏模式 - 优化垂直空间 */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+    /* 减少顶部空白 */
+    .page-header {
+        padding: 8px 10px !important;
+    }
+
+    /* 钢琴区域 */
+    .piano-section {
+        margin: 10px 0;
+    }
+
+    /* 说明文字紧凑排列 */
+    .instructions {
+        font-size: 13px;
+        padding: 10px;
+        line-height: 1.4;
+    }
+
+    /* 按钮紧凑排列 */
+    .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    /* 抽屉式菜单 */
+    .score-drawer {
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+}
+
+/* 触摸优化 - 防止误触 */
+@media (hover: none) and (pointer: coarse) {
+    /* 增大所有可点击元素 */
+    button, .btn, a.btn {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 10px 16px;
+    }
+
+    /* 钢琴键触摸反馈 */
+    .piano-key {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(255, 215, 0, 0.3);
+    }
+
+    .piano-key:active {
+        background-color: #ffd700 !important;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.8) !important;
+    }
+
+    /* 列表项触摸反馈 */
+    .score-item:active {
+        background-color: rgba(255, 215, 0, 0.2) !important;
+        transform: scale(0.98);
+    }
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .piano-key .key-name,
+    .piano-key .key-code {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* 横屏手机（更宽的屏幕）*/
+@media screen and (min-width: 481px) and (max-width: 768px) and (orientation: landscape) {
+    .piano-wrap {
+        min-width: 100%;
+        transform: none;
+    }
+
+    .piano-keyboard {
+        display: flex;
+        justify-content: center;
+    }
+
+    .piano-key.white {
+        width: 55px !important;
+        height: 150px !important;
+    }
+
+    .piano-key.black {
+        width: 38px !important;
+        height: 105px !important;
+    }
+}

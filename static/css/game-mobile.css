@@ -1,0 +1,535 @@
+/* 游戏模式移动端优化 - Game Mode Mobile Optimization */
+
+/* 移动端基础适配 */
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .game-container {
+        height: calc(100vh - 50px);
+    }
+
+    /* 顶部状态栏 - 紧凑布局 */
+    .game-header {
+        padding: 8px 10px;
+        flex-wrap: wrap;
+    }
+
+    .score-display {
+        gap: 10px;
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .score-item {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .score-label {
+        font-size: 0.7em;
+    }
+
+    .score-value {
+        font-size: 1.3em;
+    }
+
+    .game-controls {
+        width: 100%;
+        justify-content: center;
+        margin-top: 5px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 0.85em;
+        min-height: 36px;
+    }
+
+    /* 进度条 */
+    .progress-container {
+        padding: 5px 10px;
+    }
+
+    .progress-bar-wrapper {
+        height: 6px;
+    }
+
+    .progress-text {
+        font-size: 0.8em;
+    }
+
+    /* Canvas 区域 - 更多空间 */
+    .game-canvas-wrapper {
+        flex: 1;
+        min-height: 200px;
+    }
+
+    #gameCanvas {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* 判定显示 */
+    .judgment-display {
+        font-size: 2.5em;
+    }
+
+    /* 虚拟钢琴 - 紧凑布局 */
+    .virtual-piano {
+        padding: 10px 5px;
+        min-height: 100px;
+    }
+
+    .piano-keys {
+        height: 100px;
+        transform-origin: center;
+    }
+
+    .white-key {
+        width: 35px;
+        height: 100px;
+        font-size: 0.7em;
+        padding-bottom: 5px;
+    }
+
+    .black-key {
+        width: 22px;
+        height: 65px;
+        font-size: 0.65em;
+    }
+
+    /* 开始界面 */
+    .start-screen {
+        padding: 15px;
+    }
+
+    .start-screen h1 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+    }
+
+    .start-screen p {
+        font-size: 1em;
+        margin-bottom: 20px;
+    }
+
+    .song-selector {
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .song-selector label {
+        font-size: 1em;
+    }
+
+    .song-selector select {
+        padding: 12px;
+        font-size: 1em;
+    }
+
+    .difficulty-selector {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .difficulty-btn {
+        padding: 10px 20px;
+        font-size: 0.95em;
+    }
+
+    .instructions {
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 0.9em;
+    }
+
+    .instructions h3 {
+        font-size: 1.1em;
+    }
+
+    .instructions li {
+        font-size: 0.85em;
+        margin: 8px 0;
+    }
+
+    .btn-lg {
+        font-size: 1.2em !important;
+        padding: 15px 35px !important;
+    }
+
+    /* 结束界面 */
+    .end-screen h2 {
+        font-size: 2em;
+    }
+
+    .stats-display {
+        padding: 20px;
+        min-width: auto;
+        width: 90%;
+        max-width: 400px;
+    }
+
+    .stat-row {
+        font-size: 1.1em;
+        margin: 10px 0;
+    }
+
+    .achievement-badge {
+        padding: 8px 15px;
+        font-size: 0.9em;
+        margin: 4px;
+    }
+
+    .end-screen .btn {
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+
+    /* 加载动画 */
+    .loading {
+        font-size: 1.5em;
+    }
+}
+
+/* 超小屏手机 (<= 400px) */
+@media screen and (max-width: 400px) {
+    .score-display {
+        gap: 5px;
+    }
+
+    .score-label {
+        font-size: 0.65em;
+    }
+
+    .score-value {
+        font-size: 1.1em;
+    }
+
+    .btn {
+        padding: 5px 10px;
+        font-size: 0.8em;
+        min-height: 32px;
+    }
+
+    .white-key {
+        width: 30px;
+        height: 90px;
+        font-size: 0.65em;
+    }
+
+    .black-key {
+        width: 20px;
+        height: 60px;
+        font-size: 0.6em;
+    }
+
+    .judgment-display {
+        font-size: 2em;
+    }
+
+    .start-screen h1 {
+        font-size: 1.5em;
+    }
+
+    .instructions li {
+        font-size: 0.8em;
+    }
+}
+
+/* 横屏模式优化 */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .game-container {
+        height: 100vh;
+    }
+
+    .game-header {
+        padding: 5px 10px;
+    }
+
+    .score-display {
+        gap: 15px;
+        width: auto;
+        flex: 1;
+    }
+
+    .score-label {
+        font-size: 0.65em;
+    }
+
+    .score-value {
+        font-size: 1em;
+    }
+
+    .game-controls {
+        width: auto;
+        margin-top: 0;
+        flex: 0;
+    }
+
+    .btn {
+        padding: 4px 10px;
+        font-size: 0.75em;
+        min-height: 30px;
+    }
+
+    .progress-container {
+        padding: 3px 10px;
+    }
+
+    .progress-bar-wrapper {
+        height: 4px;
+    }
+
+    .progress-text {
+        font-size: 0.7em;
+        margin-top: 2px;
+    }
+
+    /* Canvas 占据更多空间 */
+    .game-canvas-wrapper {
+        flex: 1;
+        min-height: 150px;
+    }
+
+    /* 虚拟钢琴 - 更紧凑 */
+    .virtual-piano {
+        padding: 5px;
+        min-height: 70px;
+    }
+
+    .piano-keys {
+        height: 70px;
+        justify-content: center;
+    }
+
+    .white-key {
+        width: 40px;
+        height: 70px;
+        font-size: 0.65em;
+    }
+
+    .black-key {
+        width: 25px;
+        height: 50px;
+        font-size: 0.6em;
+    }
+
+    .judgment-display {
+        font-size: 2em;
+    }
+
+    /* 开始界面横屏适配 */
+    .start-screen {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .start-screen h1 {
+        width: 100%;
+        font-size: 1.8em;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .start-screen p {
+        width: 100%;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+    }
+
+    .song-selector {
+        width: 45%;
+        margin-bottom: 15px;
+    }
+
+    .difficulty-selector {
+        width: 45%;
+        margin-bottom: 15px;
+    }
+
+    .instructions {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        font-size: 0.75em;
+    }
+
+    .instructions h3 {
+        font-size: 0.95em;
+        margin-bottom: 8px;
+    }
+
+    .instructions li {
+        font-size: 0.7em;
+        margin: 5px 0;
+    }
+
+    .btn-lg {
+        font-size: 1.1em !important;
+        padding: 10px 25px !important;
+    }
+
+    /* 结束界面横屏适配 */
+    .end-screen h2 {
+        font-size: 1.8em;
+        margin-bottom: 10px;
+    }
+
+    .stats-display {
+        padding: 15px;
+        max-width: 500px;
+    }
+
+    .stat-row {
+        font-size: 0.95em;
+        margin: 8px 0;
+    }
+}
+
+/* 竖屏模式优化 */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+    /* 优化垂直空间分配 */
+    .game-header {
+        min-height: 60px;
+    }
+
+    .progress-container {
+        min-height: 35px;
+    }
+
+    .game-canvas-wrapper {
+        flex: 1;
+        min-height: 250px;
+    }
+
+    .virtual-piano {
+        min-height: 110px;
+    }
+
+    /* 开始界面内容居中 */
+    .start-screen {
+        justify-content: flex-start;
+        overflow-y: auto;
+    }
+
+    .instructions {
+        max-height: 30vh;
+        overflow-y: auto;
+    }
+}
+
+/* 触摸优化 */
+@media (hover: none) and (pointer: coarse) {
+    /* 所有按钮增大触摸区域 */
+    .btn {
+        min-width: 60px;
+        min-height: 40px;
+        touch-action: manipulation;
+    }
+
+    /* 虚拟钢琴键 */
+    .piano-key {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .piano-key:active {
+        transform: translateY(2px) scale(0.95);
+    }
+
+    .white-key:active {
+        background: linear-gradient(to bottom, #FFD700 0%, #FFA500 100%) !important;
+    }
+
+    .black-key:active {
+        background: linear-gradient(to bottom, #FFD700 0%, #FFA500 100%) !important;
+    }
+
+    /* 难度按钮 */
+    .difficulty-btn {
+        min-width: 80px;
+        min-height: 44px;
+    }
+
+    /* 歌曲选择 */
+    .song-selector select {
+        min-height: 44px;
+        font-size: 16px; /* 防止iOS缩放 */
+    }
+}
+
+/* 平板横屏 (768px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .white-key {
+        width: 45px;
+        height: 130px;
+    }
+
+    .black-key {
+        width: 28px;
+        height: 90px;
+    }
+
+    .score-value {
+        font-size: 1.5em;
+    }
+
+    .judgment-display {
+        font-size: 3.5em;
+    }
+}
+
+/* 超宽屏横屏手机 */
+@media screen and (min-width: 600px) and (max-width: 900px) and (orientation: landscape) {
+    .piano-keys {
+        height: 90px;
+        justify-content: center;
+        gap: 2px;
+    }
+
+    .white-key {
+        width: 50px;
+        height: 90px;
+        font-size: 0.75em;
+    }
+
+    .black-key {
+        width: 32px;
+        height: 65px;
+        font-size: 0.7em;
+    }
+}
+
+/* iOS安全区域适配 */
+@supports (padding: max(0px)) {
+    .game-container {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .virtual-piano {
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+}
+
+/* 阻止下拉刷新和弹性滚动 */
+@media screen and (max-width: 768px) {
+    .game-container {
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: auto;
+    }
+
+    body {
+        overscroll-behavior: none;
+        position: fixed;
+        width: 100%;
+        height: 100vh;
+    }
+}

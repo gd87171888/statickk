@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            color: #FFD700;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .info {
+            background: rgba(255, 215, 0, 0.2);
+            border-left: 4px solid #FFD700;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        .checklist li:before {
+            content: "☐ ";
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📱 移动端测试页面</h1>
+    
+    <div class="info">
+        <strong>🎉 v2.3.3 移动端优化完成！</strong><br>
+        本次更新主要修复了游戏模式的音符对齐问题，并全面优化了移动端体验。
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 快速访问</h2>
+        <div style="text-align: center;">
+            <a href="./index.html" class="btn">🏠 主页钢琴</a>
+            <a href="./game-mode.html" class="btn">🎮 游戏模式</a>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ 主页钢琴测试清单</h2>
+        <ul class="checklist">
+            <li>钢琴键盘可以横向滚动</li>
+            <li>钢琴键足够大，容易点击（白键≥45px，黑键≥30px）</li>
+            <li>点击钢琴键有声音</li>
+            <li>触摸反馈明显（按下变色）</li>
+            <li>横屏模式显示正常</li>
+            <li>竖屏模式显示正常</li>
+            <li>控制按钮大小合适（≥44x44px）</li>
+            <li>曲谱列表在移动端显示良好</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ 游戏模式测试清单</h2>
+        <ul class="checklist">
+            <li><strong>关键：音符轨道和钢琴键完全对齐</strong></li>
+            <li>能看到半透明的轨道辅助线</li>
+            <li>音符下落清晰可见</li>
+            <li>虚拟钢琴键盘足够大，容易点击</li>
+            <li>判定线（金色横线）清晰可见</li>
+            <li>分数、连击、准确率显示正常</li>
+            <li>横屏模式体验更佳</li>
+            <li>竖屏模式能正常游玩</li>
+            <li>触摸钢琴键有反馈</li>
+            <li>屏幕旋转后自动适配</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 测试步骤</h2>
+        <div class="test-item">
+            <h3>1. 主页钢琴测试</h3>
+            <p>1. 点击上方"主页钢琴"按钮</p>
+            <p>2. 点击页面任意位置激活音频</p>
+            <p>3. 尝试点击钢琴键，检查是否有声音</p>
+            <p>4. 横向滚动查看完整键盘</p>
+            <p>5. 旋转屏幕测试横屏/竖屏</p>
+        </div>
+        <div class="test-item">
+            <h3>2. 游戏模式测试</h3>
+            <p>1. 点击上方"游戏模式"按钮</p>
+            <p>2. 选择"简单爱"或"告白气球"</p>
+            <p>3. 选择"简单"难度</p>
+            <p>4. 点击"开始游戏"</p>
+            <p>5. <strong>重点观察：音符是否正好落在对应的钢琴键上</strong></p>
+            <p>6. 尝试点击虚拟钢琴键盘进行游戏</p>
+            <p>7. 旋转屏幕测试自动适配</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 设备信息</h2>
+        <div class="test-item" id="deviceInfo">
+            <p>屏幕宽度：<span id="screenWidth"></span>px</p>
+            <p>屏幕高度：<span id="screenHeight"></span>px</p>
+            <p>设备像素比：<span id="devicePixelRatio"></span></p>
+            <p>用户代理：<span id="userAgent"></span></p>
+            <p>触摸支持：<span id="touchSupport"></span></p>
+            <p>当前方向：<span id="orientation"></span></p>
+        </div>
+    </div>
+
+    <div class="info">
+        <strong>💡 建议：</strong><br>
+        - 游戏模式建议使用横屏以获得最佳体验<br>
+        - 首次使用需要点击页面激活音频<br>
+        - 详细说明请查看 <a href="./MOBILE-TEST.md" style="color: #FFD700;">MOBILE-TEST.md</a>
+    </div>
+
+    <script>
+        // 显示设备信息
+        document.getElementById('screenWidth').textContent = window.innerWidth;
+        document.getElementById('screenHeight').textContent = window.innerHeight;
+        document.getElementById('devicePixelRatio').textContent = window.devicePixelRatio;
+        document.getElementById('userAgent').textContent = navigator.userAgent.substring(0, 100) + '...';
+        document.getElementById('touchSupport').textContent = 'ontouchstart' in window ? '✅ 是' : '❌ 否';
+        
+        function updateOrientation() {
+            const orientation = window.innerWidth > window.innerHeight ? '横屏 (Landscape)' : '竖屏 (Portrait)';
+            document.getElementById('orientation').textContent = orientation;
+        }
+        
+        updateOrientation();
+        window.addEventListener('resize', updateOrientation);
+        window.addEventListener('orientationchange', updateOrientation);
+    </script>
+</body>
+</html>
