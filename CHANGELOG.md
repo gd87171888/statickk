@@ -2,6 +2,83 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.4] - 2024-11-06
+
+### 🐛 Critical Bug Fixes | 重要问题修复
+- **修复移动端开始界面显示问题** ✅
+  - 开始界面改为可滚动（overflow-y: auto）
+  - 调整布局使所有内容可见
+  - 开始游戏按钮增大并居中显示
+  - 确保在小屏幕设备上完全可访问
+
+- **修复游戏模式钢琴键无声音问题** ✅
+  - 添加音频初始化函数 `initAudio()`
+  - 在用户首次交互时自动初始化 Tone.js
+  - 允许游戏开始前就可以试音
+  - 优化音频上下文启动流程
+
+- **优化按键映射可视化** ✅
+  - 虚拟钢琴键上显示清晰的键盘按键标签
+  - 下落音符上显示对应的键盘字母（大号黄色背景）
+  - 重新设计钢琴键显示结构（音符名 + 键盘按键）
+  - 移动端针对性优化按键标签大小
+
+### 🎨 UI/UX Improvements | 界面改进
+- **钢琴键标签优化**
+  - 添加 `.key-label` 类显示音符名称（Do、Re、Mi等）
+  - 添加 `.key-binding` 类显示键盘按键（黄色背景高亮）
+  - 针对白键和黑键分别优化字体大小
+  - 移动端、平板、桌面分别适配
+
+- **音符显示增强**
+  - 音符上的按键提示字体增大到20px bold
+  - 黄色背景方块 + 黑色字母，清晰可见
+  - Canvas渲染优化，确保文字居中对齐
+
+- **游戏说明更新**
+  - 更清晰的操作说明
+  - 添加"试音"提示，鼓励用户在开始前测试钢琴键
+  - 明确说明"音符上的字母 = 键盘按键"
+
+### 🔧 Technical Improvements | 技术改进
+- **音频初始化机制**
+  ```javascript
+  async function initAudio() {
+      if (!audioInitialized) {
+          await Tone.start();
+          audioInitialized = true;
+      }
+  }
+  ```
+  - 监听 click 和 touchstart 事件自动初始化
+  - 在按键处理函数中确保音频已启动
+  - 支持游戏外试音功能
+
+- **钢琴键HTML结构优化**
+  ```html
+  <div class="key-label">Do</div>
+  <div class="key-binding">A</div>
+  ```
+  - 使用flex布局垂直排列
+  - 分离音符名称和按键显示
+  - 更好的响应式支持
+
+### 📱 Mobile Optimization | 移动端优化
+- 所有屏幕尺寸的按键标签优化
+  - 超小屏幕（<400px）
+  - 移动端（<768px）
+  - 横屏模式
+  - 平板（768-1024px）
+- 开始游戏按钮宽度80%，最大300px
+- 最小触摸区域50px高度
+- 改进滚动体验
+
+### 📚 Documentation | 文档更新
+- 📖 新增 `GAME-MODE-FIX-NOTES.md` - 详细的修复说明
+- 包含完整的测试清单
+- 技术细节和实现说明
+- 快速测试指南
+
 ## [2.3.3] - 2024-11-05
 
 ### 📱 Mobile Optimization | 移动端优化
