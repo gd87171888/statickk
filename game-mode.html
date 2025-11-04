@@ -782,11 +782,17 @@
         async function loadSongData(songName) {
             try {
                 const response = await fetch(`./static/xmlscore/${songName}.json`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
+                if (!data || !data.measures) {
+                    throw new Error('Invalid song data format');
+                }
                 return data;
             } catch (error) {
                 console.error('Failed to load song:', error);
-                alert('加载歌曲失败！');
+                alert(`加载歌曲失败！\n错误：${error.message}\n请检查歌曲文件是否存在。`);
                 return null;
             }
         }
@@ -1085,15 +1091,29 @@
         startGameBtn.addEventListener('click', async () => {
             if (!gameState.selectedSong) return;
             
+            // 显示加载提示
+            startGameBtn.disabled = true;
+            startGameBtn.textContent = '加载中...';
+            
             // 加载歌曲数据
+            console.log(`Loading song: ${gameState.selectedSong}`);
             const songData = await loadSongData(gameState.selectedSong);
+            
+            // 恢复按钮状态
+            startGameBtn.disabled = false;
+            startGameBtn.textContent = '开始游戏 🚀';
+            
             if (!songData) return;
+            
+            console.log(`Song loaded successfully. Measures: ${songData.measures?.length || 0}`);
             
             gameState.songData = songData;
             gameState.notes = parseSongToNotes(songData, gameState.difficulty);
             
+            console.log(`Parsed ${gameState.notes.length} notes from song`);
+            
             if (gameState.notes.length === 0) {
-                alert('这首歌没有可用的音符！');
+                alert('这首歌没有可用的音符！\n可能是音符范围超出了 C4-D5 的范围。');
                 return;
             }
             
