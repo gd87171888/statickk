@@ -221,12 +221,29 @@
             user-select: none;
             transition: all 0.1s;
             display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding-bottom: 10px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 5px;
             font-size: 0.9em;
             font-weight: bold;
             border: 2px solid rgba(0,0,0,0.3);
+        }
+        
+        .key-label {
+            font-size: 0.75em;
+            line-height: 1.2;
+            text-align: center;
+        }
+        
+        .key-binding {
+            font-size: 1.2em;
+            background: rgba(255, 215, 0, 0.3);
+            border: 2px solid #FFD700;
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin-top: 3px;
+            font-weight: bold;
         }
 
         .white-key {
@@ -278,10 +295,12 @@
             background: rgba(0, 0, 0, 0.95);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             z-index: 200;
             padding: 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .start-screen h1 {
@@ -576,13 +595,20 @@
                     <li>✨ Perfect（完美）：时机完美！+100分</li>
                     <li>👍 Good（不错）：时机尚可！+50分</li>
                     <li>❌ Miss（失误）：错过音符，连击清零</li>
-                    <li>⌨️ 键盘操作：A-L 对应白键，W-P 对应黑键</li>
+                    <li>⌨️ 键盘操作：按键盘字母（音符上会显示对应按键）</li>
                     <li>📱 触屏操作：直接点击/触摸底部的虚拟钢琴键盘</li>
+                    <li>🔊 试音：现在就可以点击下方钢琴键试听声音！</li>
                     <li>🔥 保持连击获得更高分数！</li>
-                    <li>💡 提示：音符轨道和底部钢琴键盘完全对齐</li>
+                    <li>💡 提示：音符上的字母 = 键盘按键</li>
                 </ul>
             </div>
 
+            <div style="margin-bottom: 20px; text-align: center; width: 100%;">
+                <p style="color: #FFD700; font-size: 0.9em; margin-bottom: 10px;">
+                    👇 试试点击钢琴键，熟悉按键位置
+                </p>
+            </div>
+            
             <button class="btn btn-primary btn-lg" id="startGameBtn" style="font-size:1.5em; padding:20px 50px;" disabled>开始游戏</button>
         </div>
 
@@ -728,6 +754,7 @@
         };
 
         // ==================== 音频引擎 ====================
+        let audioInitialized = false;
         const sampler = new Tone.Sampler({
             urls: {
                 C4: "C4.mp3", D4: "D4.mp3", E4: "E4.mp3", F4: "F4.mp3",
@@ -735,9 +762,22 @@
             },
             baseUrl: "./static/samples/piano/",
             onload: () => {
-                console.log('Piano samples loaded');
+                console.log('🎹 Piano samples loaded successfully');
             }
         }).toDestination();
+        
+        // 初始化音频上下文（需要用户交互）
+        async function initAudio() {
+            if (!audioInitialized) {
+                try {
+                    await Tone.start();
+                    audioInitialized = true;
+                    console.log('🔊 Audio context started');
+                } catch (error) {
+                    console.error('❌ Failed to start audio:', error);
+                }
+            }
+        }
 
         // ==================== DOM 元素 ====================
         const startScreen = document.getElementById('startScreen');
@@ -982,7 +1022,10 @@
                 key.style.left = (mapping.lane * laneWidth) + 'px';
                 key.style.width = laneWidth + 'px';
                 
-                key.innerHTML = `<div>${mapping.display}<br><small>${mapping.key.toUpperCase()}</small></div>`;
+                key.innerHTML = `
+                    <div class="key-label">${mapping.display}</div>
+                    <div class="key-binding">${mapping.key.toUpperCase()}</div>
+                `;
                 key.addEventListener('mousedown', () => onKeyPress(note));
                 key.addEventListener('touchstart', (e) => {
                     e.preventDefault();
@@ -1010,7 +1053,10 @@
                     key.style.left = (mapping.lane * laneWidth - blackKeyWidth / 2) + 'px';
                     key.style.width = blackKeyWidth + 'px';
                     
-                    key.innerHTML = `<div>${mapping.display}<br><small>${mapping.key.toUpperCase()}</small></div>`;
+                    key.innerHTML = `
+                        <div class="key-label" style="font-size: 0.65em;">${mapping.display}</div>
+                        <div class="key-binding" style="font-size: 1em; padding: 1px 4px;">${mapping.key.toUpperCase()}</div>
+                    `;
                     key.addEventListener('mousedown', () => onKeyPress(note));
                     key.addEventListener('touchstart', (e) => {
                         e.preventDefault();
@@ -1022,6 +1068,11 @@
         }
 
         generateVirtualPiano();
+        
+        // ==================== 初始化音频（用户交互时） ====================
+        // 在用户任何点击时初始化音频
+        document.addEventListener('click', initAudio, { once: true });
+        document.addEventListener('touchstart', initAudio, { once: true });
 
         // ==================== 键盘事件 ====================
         document.addEventListener('keydown', (e) => {
@@ -1038,8 +1089,16 @@
         });
 
         // ==================== 按键处理 ====================
-        function onKeyPress(note) {
-            if (!gameState.isPlaying || gameState.isPaused) return;
+        async function onKeyPress(note) {
+            // 确保音频已初始化
+            await initAudio();
+            
+            if (!gameState.isPlaying || gameState.isPaused) {
+                // 即使游戏未开始，也可以试音
+                sampler.triggerAttackRelease(note, '8n');
+                highlightKey(note);
+                return;
+            }
             
             // 播放声音
             sampler.triggerAttackRelease(note, '8n');
@@ -1219,11 +1278,23 @@
                 ctx.fillRect(x - width/2, y - height, width, height);
                 ctx.shadowBlur = 0;
                 
-                // 绘制音符名称
+                // 绘制键盘按键提示（更大、更明显）
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 14px Arial';
+                ctx.font = 'bold 20px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText(note.pitch, x, y - height/2);
+                ctx.textBaseline = 'middle';
+                
+                // 获取对应的键盘按键
+                const keyMapping = NOTE_TO_KEY_MAP[note.pitch];
+                if (keyMapping) {
+                    // 绘制黄色背景
+                    ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
+                    ctx.fillRect(x - 15, y - height/2 - 12, 30, 24);
+                    
+                    // 绘制按键字母
+                    ctx.fillStyle = '#000';
+                    ctx.fillText(keyMapping.key.toUpperCase(), x, y - height/2);
+                }
             }
             
             // 检查漏掉的音符
@@ -1252,6 +1323,9 @@
             // 显示加载提示
             startGameBtn.disabled = true;
             startGameBtn.textContent = '⏳ 加载中...';
+            
+            // 初始化音频
+            await initAudio();
             
             // 加载歌曲数据
             const songData = await loadSongData(gameState.selectedSong);
@@ -1297,9 +1371,6 @@
             // 隐藏开始界面
             startScreen.style.display = 'none';
             pauseBtn.disabled = false;
-            
-            // 启动 Tone.js
-            await Tone.start();
             
             // 倒计时
             let countdown = 3;
