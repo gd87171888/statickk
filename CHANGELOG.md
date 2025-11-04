@@ -2,6 +2,65 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.5] - 2024-11-06
+
+### 🐛 Critical Bug Fixes | 重要问题修复
+- **修复游戏模式键盘按键完全无响应问题** ✅
+  - 移除键盘事件监听器中的错误条件判断
+  - 之前的条件 `if (!gameState.isPlaying || gameState.isPaused) return;` 导致游戏未开始时键盘完全不响应
+  - 现在键盘在任何时候都可以使用（试音、游戏中、暂停时）
+  - 修复后试音功能正常工作
+
+- **修复游戏中按键总是判定为 Miss 的问题** ✅
+  - 放宽判定窗口，使游戏更容易上手
+  - 简单模式：Perfect 150ms, Good 300ms（原80ms/150ms）
+  - 普通模式：Perfect 120ms, Good 250ms（原60ms/120ms）
+  - 困难模式：Perfect 80ms, Good 180ms（原40ms/100ms）
+  - 判定窗口扩大约2倍，大幅改善游戏体验
+
+- **重构按键处理逻辑** ✅
+  - onKeyPress 函数现在无论游戏状态如何都会播放声音
+  - 只在游戏进行中才进行音符判定
+  - 统一了试音和游戏内按键的处理流程
+  - 保证每次按键都有即时的声音和视觉反馈
+
+### 🔧 Technical Improvements | 技术改进
+- **增强调试日志**
+  - 按键时输出当前游戏状态（Playing、Paused）
+  - 判定时显示当前时间和音符时间
+  - 显示判定窗口和时间差
+  - 显示判定结果（Perfect/Good/Miss）
+  - 便于开发者和用户诊断问题
+
+- **优化代码逻辑**
+  ```javascript
+  // 修改前：键盘事件直接return，阻止试音
+  document.addEventListener('keydown', (e) => {
+      if (!gameState.isPlaying || gameState.isPaused) return;
+      // ...
+  });
+  
+  // 修改后：始终调用onKeyPress，由函数内部处理
+  document.addEventListener('keydown', (e) => {
+      // 移除条件限制，允许任何时候响应键盘
+      // ...
+  });
+  ```
+
+### 📚 Documentation | 文档更新
+- 📖 新增 `test-game-fix.html` - 修复测试报告页面
+  - 详细的问题诊断
+  - 修复方案说明
+  - 完整的测试清单
+  - 技术细节和预期效果
+
+### 🎮 User Experience | 用户体验
+- ✅ 试音功能完全正常 - 开始界面就可以测试钢琴声音
+- ✅ 游戏判定更宽容 - 新手也能轻松上手
+- ✅ 声音反馈即时 - 每次按键都有声音
+- ✅ 调试信息完善 - 控制台有详细日志
+- ✅ 视觉反馈清晰 - 钢琴键高亮效果
+
 ## [2.3.4] - 2024-11-06
 
 ### 🐛 Critical Bug Fixes | 重要问题修复
