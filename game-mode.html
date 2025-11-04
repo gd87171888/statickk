@@ -9,6 +9,7 @@
     <link rel="shortcut icon" href="./favicon.png">
     <link href="./static/css/share.min.css" rel="stylesheet">
     <link href="./static/css/nav-bar.css" rel="stylesheet">
+    <link href="./static/css/game-mobile.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -571,13 +572,14 @@
             <div class="instructions">
                 <h3>📖 游戏说明</h3>
                 <ul>
-                    <li>音符会从上方落下，在到达底部判定线时按键</li>
-                    <li>Perfect：时机完美！+100分</li>
-                    <li>Good：不错！+50分</li>
-                    <li>Miss：失误，连击清零</li>
-                    <li>键盘映射：A-L 为白键，W-P 为黑键</li>
-                    <li>也可以直接点击/触摸底部的虚拟钢琴键盘</li>
-                    <li>保持连击获得更高分数！</li>
+                    <li>🎵 音符从上方落下，到达底部金色判定线时按对应的键</li>
+                    <li>✨ Perfect（完美）：时机完美！+100分</li>
+                    <li>👍 Good（不错）：时机尚可！+50分</li>
+                    <li>❌ Miss（失误）：错过音符，连击清零</li>
+                    <li>⌨️ 键盘操作：A-L 对应白键，W-P 对应黑键</li>
+                    <li>📱 触屏操作：直接点击/触摸底部的虚拟钢琴键盘</li>
+                    <li>🔥 保持连击获得更高分数！</li>
+                    <li>💡 提示：音符轨道和底部钢琴键盘完全对齐</li>
                 </ul>
             </div>
 
@@ -762,11 +764,68 @@
         // ==================== Canvas 设置 ====================
         function resizeCanvas() {
             const wrapper = canvas.parentElement;
-            canvas.width = wrapper.clientWidth;
-            canvas.height = wrapper.clientHeight;
+            const width = wrapper.clientWidth;
+            const height = wrapper.clientHeight;
+            
+            // 设置canvas实际大小
+            canvas.width = width;
+            canvas.height = height;
+            
+            // 如果游戏正在进行，需要重新生成虚拟钢琴以适应新尺寸
+            if (gameState.isPlaying || gameState.isPaused) {
+                // 游戏中不重新生成，避免打断游戏
+            } else {
+                // 重新生成虚拟钢琴以适应屏幕
+                generateVirtualPiano();
+            }
+            
+            console.log(`Canvas resized: ${width}x${height}`);
         }
+        
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(resizeCanvas, 100); // 延迟以确保布局已更新
+        });
+
+        // ==================== 移动端检测 ====================
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isSmallScreen = window.innerWidth <= 768;
+        
+        if (isMobile || isSmallScreen) {
+            console.log('📱 Mobile device detected');
+            console.log(`Screen size: ${window.innerWidth}x${window.innerHeight}`);
+            console.log(`Orientation: ${window.orientation || screen.orientation.angle}`);
+            
+            // 移动端优化提示
+            if (window.innerWidth < 600 && window.innerHeight > window.innerWidth) {
+                // 竖屏小屏幕，建议横屏
+                setTimeout(() => {
+                    const orientationTip = document.createElement('div');
+                    orientationTip.style.cssText = `
+                        position: fixed;
+                        top: 60px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: rgba(255, 215, 0, 0.95);
+                        color: #333;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        font-size: 0.9em;
+                        z-index: 300;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                    `;
+                    orientationTip.textContent = '💡 建议横屏游玩，体验更佳！';
+                    document.body.appendChild(orientationTip);
+                    
+                    setTimeout(() => {
+                        orientationTip.style.transition = 'opacity 0.5s';
+                        orientationTip.style.opacity = '0';
+                        setTimeout(() => orientationTip.remove(), 500);
+                    }, 3000);
+                }, 1000);
+            }
+        }
 
         // ==================== 难度选择 ====================
         document.querySelectorAll('.difficulty-btn').forEach(btn => {
@@ -893,11 +952,22 @@
         }
 
         // ==================== 生成虚拟钢琴键盘 ====================
+        // 这个函数确保虚拟钢琴键盘和Canvas音符轨道对齐
         function generateVirtualPiano() {
             virtualPiano.innerHTML = '<div class="piano-keys" id="pianoKeys"></div>';
             const pianoKeys = document.getElementById('pianoKeys');
             
-            // 白键
+            // 获取lane宽度（与游戏循环中的laneWidth保持一致）
+            const laneWidth = 50;
+            const totalLanes = 9; // C4到D5，共9个白键
+            const pianoWidth = laneWidth * totalLanes;
+            
+            // 设置钢琴键盘容器宽度
+            pianoKeys.style.width = pianoWidth + 'px';
+            pianoKeys.style.margin = '0 auto';
+            pianoKeys.style.position = 'relative';
+            
+            // 白键 - 按照lane位置排列
             const whiteKeys = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5'];
             whiteKeys.forEach(note => {
                 const mapping = NOTE_TO_KEY_MAP[note];
@@ -905,6 +975,13 @@
                 key.className = 'piano-key white-key';
                 key.dataset.note = note;
                 key.dataset.key = mapping.key;
+                key.dataset.lane = mapping.lane;
+                
+                // 根据lane位置设置白键位置
+                key.style.position = 'absolute';
+                key.style.left = (mapping.lane * laneWidth) + 'px';
+                key.style.width = laneWidth + 'px';
+                
                 key.innerHTML = `<div>${mapping.display}<br><small>${mapping.key.toUpperCase()}</small></div>`;
                 key.addEventListener('mousedown', () => onKeyPress(note));
                 key.addEventListener('touchstart', (e) => {
@@ -914,25 +991,25 @@
                 pianoKeys.appendChild(key);
             });
 
-            // 黑键
-            const blackKeys = [
-                { note: 'C#4', left: 35 },
-                { note: 'D#4', left: 85 },
-                { note: 'F#4', left: 185 },
-                { note: 'G#4', left: 235 },
-                { note: 'A#4', left: 285 },
-                { note: 'C#5', left: 385 },
-                { note: 'D#5', left: 435 }
-            ];
+            // 黑键 - 根据lane位置动态计算
+            const blackKeyNotes = ['C#4', 'D#4', 'F#4', 'G#4', 'A#4', 'C#5', 'D#5'];
             
-            blackKeys.forEach(({ note, left }) => {
+            blackKeyNotes.forEach(note => {
                 if (NOTE_TO_KEY_MAP[note]) {
                     const mapping = NOTE_TO_KEY_MAP[note];
                     const key = document.createElement('div');
                     key.className = 'piano-key black-key';
-                    key.style.left = left + 'px';
                     key.dataset.note = note;
                     key.dataset.key = mapping.key;
+                    key.dataset.lane = mapping.lane;
+                    
+                    // 黑键位置 = lane * laneWidth - 黑键宽度的一半
+                    // 黑键宽度设为30px（在CSS中定义）
+                    const blackKeyWidth = 30;
+                    key.style.position = 'absolute';
+                    key.style.left = (mapping.lane * laneWidth - blackKeyWidth / 2) + 'px';
+                    key.style.width = blackKeyWidth + 'px';
+                    
                     key.innerHTML = `<div>${mapping.display}<br><small>${mapping.key.toUpperCase()}</small></div>`;
                     key.addEventListener('mousedown', () => onKeyPress(note));
                     key.addEventListener('touchstart', (e) => {
@@ -1103,7 +1180,21 @@
             const config = CONFIG[gameState.difficulty];
             const speed = config.speed;
             const laneWidth = 50;
-            const startX = (canvas.width - laneWidth * 9) / 2;
+            const totalLanes = 9;
+            const pianoWidth = laneWidth * totalLanes;
+            // 确保startX和虚拟钢琴键盘居中位置一致
+            const startX = (canvas.width - pianoWidth) / 2;
+            
+            // 绘制轨道线（辅助线，方便玩家看清音符轨道）
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= totalLanes; i++) {
+                const x = startX + i * laneWidth;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
             
             for (const note of gameState.notes) {
                 if (note.judged) continue;
@@ -1114,7 +1205,8 @@
                 // 只渲染可见范围内的音符
                 if (y < -100 || y > canvas.height) continue;
                 
-                const x = startX + note.lane * laneWidth;
+                // 音符中心位置对齐到lane中心
+                const x = startX + note.lane * laneWidth + laneWidth / 2;
                 const width = note.isBlack ? 30 : 40;
                 const height = Math.max(note.duration * speed, 20);
                 
