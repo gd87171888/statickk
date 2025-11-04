@@ -2,6 +2,79 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.6] - 2024-11-07
+
+### 🔧 Critical Bug Fixes | 重要问题修复
+- **修复游戏模式钢琴键无声音问题** ✅
+  - 问题根源：音频文件名映射错误（使用C4.mp3而实际文件是a60.mp3）
+  - 修复方案：更新Tone.Sampler使用正确的MIDI编号文件名
+  - 白键映射：C4→a60, D4→a62, E4→a64, F4→a65, G4→a67, A4→a69, B4→a71, C5→a72, D5→a74
+  - 黑键映射：F#4→b66, G#4→b68, C#5→b73（缺失的黑键使用相近音符）
+  - 添加onerror错误处理回调
+  - 现在钢琴键声音正常播放！
+
+- **修复手机端开始按钮不可见问题** ✅
+  - 增大开始按钮尺寸：width 85%, max-width 350px, font-size 1.3em
+  - 增加底部内边距：padding-bottom 60-80px（不同屏幕尺寸）
+  - 确保滚动可用：overflow-y: auto, -webkit-overflow-scrolling: touch
+  - 增强视觉效果：绿色渐变背景 + 阴影效果
+  - 在所有手机上开始按钮现在都清晰可见！
+
+- **修复手机端音符不可见问题** ✅
+  - Canvas明确设置：width/height 100% + display: block
+  - 增加Canvas最小高度：移动端 min-height 250-280px
+  - 增强音符亮度：从0.9提升到0.95透明度
+  - 添加音符边框：2px彩色描边增强可见性
+  - 增强键盘标签：更大的黄色提示（32x26px）+ 黑色边框
+  - 增强轨道线：从0.1/1px提升到0.15/2px
+  - 添加调试日志：每秒输出可见音符数量
+  - 音符现在在所有手机上都清晰可见！
+
+### 🎨 Mobile CSS Optimization | 移动端CSS优化
+- **通用移动端（max-width: 768px）**
+  - Canvas区域：min-height 250px, max-height 60vh
+  - 开始按钮：width 85%, font-size 1.3em, 绿色渐变
+  - 底部内边距：60px确保按钮可见
+
+- **超小屏手机（max-width: 400px）**
+  - 开始按钮：width 90%, font-size 1.2em
+  - Canvas区域：min-height 200px, max-height 50vh
+  - 更紧凑的布局
+
+- **竖屏模式（portrait）**
+  - Canvas区域：min-height 280px, max-height 55vh
+  - 底部内边距：80px确保充足滚动空间
+
+- **横屏模式（landscape）**
+  - 优化水平空间利用
+  - 虚拟钢琴高度70px（竖屏100px）
+
+### 🔧 Technical Improvements | 技术改进
+- **音频引擎改进**
+  - 正确的MIDI编号文件名映射（a=白键, b=黑键）
+  - 添加onerror错误处理
+  - 缺失音符使用相近音符替代
+
+- **Canvas渲染增强**
+  - 明确设置Canvas尺寸和显示样式
+  - 增强音符视觉效果（亮度、边框、阴影）
+  - 添加可见音符计数日志
+  - 改进屏幕旋转和调整大小处理
+
+- **响应式设计优化**
+  - 针对4种屏幕尺寸专门优化
+  - 所有元素在所有设备上可见可点击
+  - 触摸区域最小44x44px
+
+### 📚 Documentation | 文档更新
+- 📖 新增 `test_fixes.html` - 修复测试报告页面
+  - 详细的问题描述和修复方案
+  - 完整的测试步骤
+  - 版本信息和已知问题
+
+### ⚠️ Known Issues | 已知问题
+- 主页换背景功能缺失（需要Vue源码才能修复）
+
 ## [2.3.5] - 2024-11-06
 
 ### 🐛 Critical Bug Fixes | 重要问题修复

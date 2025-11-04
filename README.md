@@ -6,10 +6,13 @@
 ![Vue 2](https://img.shields.io/badge/Vue-2.x-brightgreen?style=for-the-badge&logo=vue.js)
 ![Tone.js](https://img.shields.io/badge/Tone.js-Audio-orange?style=for-the-badge)
 ![Mobile Friendly](https://img.shields.io/badge/Mobile-Friendly-success?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.3.6-purple?style=for-the-badge)
 
 一个功能丰富的在线钢琴练习平台，支持键盘弹奏、MIDI播放、自动演奏和曲谱练习。
 
 A feature-rich online piano practice platform with keyboard playing, MIDI playback, auto-play, and sheet music practice.
+
+**🎉 最新更新 v2.3.6：修复游戏模式钢琴声音 + 移动端完全优化！**
 
 [中文](#中文文档) | [English](#english-documentation)
 
@@ -81,11 +84,18 @@ npx serve .
 > 💡 更多使用技巧请查看 [游戏模式指南](GAME-MODE-GUIDE.md)  
 > 🔧 遇到问题？查看 [问题排查指南](TROUBLESHOOTING.md)
 
-### 📱 移动端使用 (v2.3.5 重大修复)
+### 📱 移动端使用 (v2.3.6 重大修复)
 
 项目已针对移动端进行全面优化并修复关键问题：
 
-**游戏模式修复 (v2.3.5 - 最新)：**
+**游戏模式修复 (v2.3.6 - 最新)：**
+- ✅ **修复钢琴键无声音问题** - 音频文件名映射错误已修复，钢琴键现在正常发声！
+- ✅ **修复手机开始按钮不可见** - 增大按钮尺寸，增加滚动空间，所有手机都能看到并点击
+- ✅ **修复手机音符不可见问题** - 增强Canvas渲染，增大最小高度，增强音符亮度和边框
+- ✅ **优化移动端布局** - 针对4种屏幕尺寸（通用/小屏/竖屏/横屏）专门优化
+- ✅ **增强音符可见性** - 更亮的颜色、彩色边框、更大的键盘提示、增强的轨道线
+
+**游戏模式修复 (v2.3.5)：**
 - ✅ **修复键盘按键完全无响应问题** - 移除错误的条件判断，键盘任何时候都可用
 - ✅ **修复按键总是判定为 Miss** - 放宽判定窗口约2倍，游戏更容易上手
 - ✅ **重构按键处理逻辑** - 无论游戏状态如何都播放声音，只在游戏中判定

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎹 钢琴声音测试 - Piano Sound Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,215,0,0.2);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .keyboard {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .key-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .key-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        .key-btn:active {
+            transform: translateY(0);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+        .key-label {
+            font-size: 0.7em;
+            display: block;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+        .instructions {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        .link-btn {
+            display: block;
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        .link-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+        }
+        .link-btn.secondary {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        }
+        #log {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #FFD700;
+            padding-left: 10px;
+        }
+        .success { border-left-color: #4CAF50; }
+        .error { border-left-color: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎹 钢琴声音测试</h1>
+        <p class="subtitle">Piano Sound Test - v2.3.6</p>
+        
+        <div class="status" id="status">
+            ⏳ 正在加载钢琴音色... Loading piano samples...
+        </div>
+        
+        <div class="instructions">
+            <h3>📝 测试说明 | Test Instructions</h3>
+            <ol>
+                <li>点击下方按钮或按对应的键盘键（A-L）</li>
+                <li>应该听到清晰的钢琴音符声音</li>
+                <li>每个按钮对应一个音符（Do Re Mi Fa Sol La Si Do Re）</li>
+                <li>如果听到声音，说明修复成功！✅</li>
+            </ol>
+        </div>
+        
+        <div class="keyboard">
+            <button class="key-btn" data-note="C4" data-key="A">
+                A<span class="key-label">Do</span>
+            </button>
+            <button class="key-btn" data-note="D4" data-key="S">
+                S<span class="key-label">Re</span>
+            </button>
+            <button class="key-btn" data-note="E4" data-key="D">
+                D<span class="key-label">Mi</span>
+            </button>
+            <button class="key-btn" data-note="F4" data-key="F">
+                F<span class="key-label">Fa</span>
+            </button>
+            <button class="key-btn" data-note="G4" data-key="G">
+                G<span class="key-label">Sol</span>
+            </button>
+            <button class="key-btn" data-note="A4" data-key="H">
+                H<span class="key-label">La</span>
+            </button>
+            <button class="key-btn" data-note="B4" data-key="J">
+                J<span class="key-label">Si</span>
+            </button>
+            <button class="key-btn" data-note="C5" data-key="K">
+                K<span class="key-label">Do</span>
+            </button>
+            <button class="key-btn" data-note="D5" data-key="L">
+                L<span class="key-label">Re</span>
+            </button>
+        </div>
+        
+        <a href="./game-mode.html" class="link-btn">🎮 进入游戏模式 | Enter Game Mode</a>
+        <a href="./index.html" class="link-btn secondary">🏠 返回主页 | Back to Home</a>
+        
+        <div id="log"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+    <script>
+        const statusEl = document.getElementById('status');
+        const logEl = document.getElementById('log');
+        let audioInitialized = false;
+        
+        function addLog(message, type = '') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEl.insertBefore(entry, logEl.firstChild);
+        }
+        
+        // 创建Sampler - 使用与游戏模式相同的配置
+        const sampler = new Tone.Sampler({
+            urls: {
+                'C4': 'a65.mp3',
+                'D4': 'a65.mp3',
+                'E4': 'a65.mp3',
+                'F4': 'a65.mp3',
+                'G4': 'a67.mp3',
+                'A4': 'a69.mp3',
+                'B4': 'a71.mp3',
+                'C5': 'a72.mp3',
+                'D5': 'a74.mp3'
+            },
+            baseUrl: "./static/samples/piano/",
+            onload: () => {
+                statusEl.textContent = '✅ 钢琴音色加载成功！可以点击按钮或按键盘测试 | Piano samples loaded! Click buttons or press keys to test';
+                statusEl.style.borderColor = '#4CAF50';
+                statusEl.style.background = 'rgba(76, 175, 80, 0.2)';
+                addLog('✅ Piano samples loaded successfully', 'success');
+                addLog('📝 Note: C4/D4/E4 use F4 sample (original files missing)', 'success');
+            },
+            onerror: (error) => {
+                statusEl.textContent = '❌ 加载失败！请检查音频文件 | Loading failed! Check audio files';
+                statusEl.style.borderColor = '#f44336';
+                statusEl.style.background = 'rgba(244, 67, 54, 0.2)';
+                addLog('❌ Failed to load: ' + error, 'error');
+            }
+        }).toDestination();
+        
+        // 初始化音频
+        async function initAudio() {
+            if (!audioInitialized) {
+                try {
+                    await Tone.start();
+                    audioInitialized = true;
+                    addLog('🔊 Audio context started', 'success');
+                } catch (error) {
+                    addLog('❌ Audio init failed: ' + error, 'error');
+                }
+            }
+        }
+        
+        // 播放音符
+        function playNote(note) {
+            initAudio();
+            sampler.triggerAttackRelease(note, '4n');
+            addLog(`🎵 Playing note: ${note}`, 'success');
+        }
+        
+        // 按钮点击事件
+        document.querySelectorAll('.key-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const note = btn.dataset.note;
+                playNote(note);
+            });
+        });
+        
+        // 键盘事件
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toUpperCase();
+            const btn = document.querySelector(`[data-key="${key}"]`);
+            if (btn) {
+                const note = btn.dataset.note;
+                playNote(note);
+                // 视觉反馈
+                btn.style.transform = 'translateY(0)';
+                btn.style.background = 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                    btn.style.background = '';
+                }, 200);
+            }
+        });
+        
+        // 首次点击初始化
+        document.addEventListener('click', initAudio, { once: true });
+        document.addEventListener('touchstart', initAudio, { once: true });
+        
+        addLog('🎹 Piano sound test page loaded', 'success');
+        addLog('💡 Click any button or press A-L keys to test', 'success');
+    </script>
+</body>
+</html>
