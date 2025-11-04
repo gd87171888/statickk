@@ -696,20 +696,20 @@
         const CONFIG = {
             easy: {
                 speed: 150,         // 像素/秒
-                perfectWindow: 80,  // ms
-                goodWindow: 150,    // ms
+                perfectWindow: 150,  // ms (放宽判定窗口)
+                goodWindow: 300,    // ms (放宽判定窗口)
                 noteLimit: 50       // 只取前N个音符
             },
             normal: {
                 speed: 200,
-                perfectWindow: 60,
-                goodWindow: 120,
+                perfectWindow: 120,  // ms (放宽判定窗口)
+                goodWindow: 250,    // ms (放宽判定窗口)
                 noteLimit: 100
             },
             hard: {
                 speed: 250,
-                perfectWindow: 40,
-                goodWindow: 100,
+                perfectWindow: 80,  // ms (放宽判定窗口)
+                goodWindow: 180,    // ms (放宽判定窗口)
                 noteLimit: null     // 全部音符
             }
         };
@@ -1076,8 +1076,7 @@
 
         // ==================== 键盘事件 ====================
         document.addEventListener('keydown', (e) => {
-            if (!gameState.isPlaying || gameState.isPaused) return;
-            
+            // 移除条件限制，允许任何时候响应键盘（包括试音）
             const key = e.key.toLowerCase();
             // 找到对应的音符
             for (const [note, mapping] of Object.entries(NOTE_TO_KEY_MAP)) {
@@ -1093,21 +1092,18 @@
             // 确保音频已初始化
             await initAudio();
             
-            if (!gameState.isPlaying || gameState.isPaused) {
-                // 即使游戏未开始，也可以试音
-                sampler.triggerAttackRelease(note, '8n');
-                highlightKey(note);
-                return;
-            }
+            console.log(`🎹 Key pressed: ${note}, Playing: ${gameState.isPlaying}, Paused: ${gameState.isPaused}`);
             
-            // 播放声音
+            // 播放声音（无论游戏状态如何都播放）
             sampler.triggerAttackRelease(note, '8n');
             
             // 视觉反馈
             highlightKey(note);
             
-            // 判定
-            judgeNote(note);
+            // 如果游戏正在进行，进行判定
+            if (gameState.isPlaying && !gameState.isPaused) {
+                judgeNote(note);
+            }
         }
 
         function highlightKey(note) {
@@ -1123,6 +1119,8 @@
             const now = (Date.now() - gameState.startTime) / 1000;
             const config = CONFIG[gameState.difficulty];
             
+            console.log(`🎯 Judging note: ${pressedNote}, Current time: ${now.toFixed(2)}s`);
+            
             // 找到该音符最近的、未判定的 note
             let closestNote = null;
             let minDelta = Infinity;
@@ -1133,18 +1131,25 @@
                 const delta = Math.abs(note.startTime - now);
                 const timeWindow = config.goodWindow / 1000;
                 
+                console.log(`   Checking note at ${note.startTime.toFixed(2)}s, delta: ${(delta * 1000).toFixed(0)}ms, window: ${config.goodWindow}ms`);
+                
                 if (delta < timeWindow && delta < minDelta) {
                     minDelta = delta;
                     closestNote = note;
                 }
             }
             
-            if (!closestNote) return;
+            if (!closestNote) {
+                console.log('   ❌ No note found within timing window');
+                return;
+            }
             
             closestNote.judged = true;
             gameState.judgedNotes.add(closestNote);
             
             const deltaMs = minDelta * 1000;
+            
+            console.log(`   ✅ Found note! Delta: ${deltaMs.toFixed(0)}ms`);
             
             if (deltaMs <= config.perfectWindow) {
                 // Perfect
@@ -1152,17 +1157,20 @@
                 gameState.combo++;
                 gameState.score += 100;
                 showJudgment('PERFECT', 'perfect');
+                console.log('   🌟 PERFECT!');
             } else if (deltaMs <= config.goodWindow) {
                 // Good
                 gameState.good++;
                 gameState.combo++;
                 gameState.score += 50;
                 showJudgment('GOOD', 'good');
+                console.log('   👍 GOOD!');
             } else {
-                // Miss
+                // Miss (这个分支理论上不会到达，因为timeWindow已经过滤了)
                 gameState.miss++;
                 gameState.combo = 0;
                 showJudgment('MISS', 'miss');
+                console.log('   ❌ MISS!');
             }
             
             gameState.maxCombo = Math.max(gameState.maxCombo, gameState.combo);
