@@ -1,24 +1,43 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-	<head>
-		<meta charset="utf-8">
-		<meta name="renderer" content="webkit">
-		<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, viewport-fit=cover">
-		<meta name="description" content="在线钢琴练习平台 - 支持键盘弹奏、MIDI播放、自动演奏、曲谱练习">
-		<meta name="keywords" content="在线钢琴,钢琴练习,MIDI,音乐学习,钢琴教学">
-		<meta name="theme-color" content="#ffffff">
-		<title>在线钢琴 - Piano Online Practice</title>
-		<link rel="shortcut icon" href="./favicon.png">
-		<link href="./static/css/share.min.css" rel="stylesheet">
-		<link href="./static/css/app.6bb525d7ae7a301ca9322bb7dbef681a.css" rel="stylesheet">
-		<link href="./static/css/mobile-responsive.css" rel="stylesheet">
-	</head>
-	<body>
-		<div id="app"></div>
-		<script src="./static/js/jquery3.min.js"></script>
-		<script type="text/javascript" src="./static/js/manifest.74ad20caa85e6a4f0cae.js"></script>
-		<script type="text/javascript" src="./static/js/vendor.536a3467a2e4c2663434.js"></script>
-		<script type="text/javascript" src="./static/js/app.5938dc65d8bdd2d31cf7.js"></script>
-	</body>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, viewport-fit=cover">
+        <meta name="description" content="在线钢琴练习平台 - 支持键盘弹奏、MIDI播放、自动演奏、曲谱练习">
+        <meta name="keywords" content="在线钢琴,钢琴练习,MIDI,音乐学习,钢琴教学">
+        <meta name="theme-color" content="#ffffff">
+        <title>在线钢琴 - Piano Online Practice</title>
+        <link rel="shortcut icon" href="./favicon.png">
+        <link href="./static/css/share.min.css" rel="stylesheet">
+        <link href="./static/css/app.6bb525d7ae7a301ca9322bb7dbef681a.css" rel="stylesheet">
+        <link href="./static/css/mobile-responsive.css" rel="stylesheet">
+        <link href="./static/css/nav-bar.css" rel="stylesheet">
+        </head>
+        <body>
+        <!-- 统一导航栏 -->
+        <nav class="main-nav">
+            <div class="main-nav-container">
+                <a href="./index.html" class="main-nav-logo">
+                    <span>🎹</span>
+                    <span>在线钢琴</span>
+                </a>
+                <button class="main-nav-toggle" onclick="document.querySelector('.main-nav-menu').classList.toggle('active')">
+                    ☰
+                </button>
+                <ul class="main-nav-menu">
+                    <li><a href="./index.html" class="active">🏠 主页</a></li>
+                    <li><a href="./follow-along.html">📚 跟弹模式</a></li>
+                    <li><a href="./game-mode.html">🎮 游戏模式</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div id="app"></div>
+        <script src="./static/js/jquery3.min.js"></script>
+        <script type="text/javascript" src="./static/js/manifest.74ad20caa85e6a4f0cae.js"></script>
+        <script type="text/javascript" src="./static/js/vendor.536a3467a2e4c2663434.js"></script>
+        <script type="text/javascript" src="./static/js/app.5938dc65d8bdd2d31cf7.js"></script>
+    </body>
 </html>

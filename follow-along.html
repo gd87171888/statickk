@@ -8,6 +8,7 @@
     <title>跟着弹 - 零基础钢琴学习</title>
     <link rel="shortcut icon" href="./favicon.png">
     <link href="./static/css/share.min.css" rel="stylesheet">
+    <link href="./static/css/nav-bar.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -20,7 +21,9 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            padding-top: 20px;
             color: #333;
+            margin: 0;
         }
 
         .container {
@@ -420,31 +423,27 @@
                 height: 100px;
             }
         }
-
-        /* 返回主页按钮 */
-        .back-home {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .back-home a {
-            color: #4CAF50;
-            text-decoration: none;
-            font-size: 1.1em;
-            padding: 10px 20px;
-            border: 2px solid #4CAF50;
-            border-radius: 8px;
-            display: inline-block;
-            transition: all 0.3s;
-        }
-
-        .back-home a:hover {
-            background: #4CAF50;
-            color: white;
-        }
     </style>
 </head>
 <body>
+    <!-- 统一导航栏 -->
+    <nav class="main-nav">
+        <div class="main-nav-container">
+            <a href="./index.html" class="main-nav-logo">
+                <span>🎹</span>
+                <span>在线钢琴</span>
+            </a>
+            <button class="main-nav-toggle" onclick="document.querySelector('.main-nav-menu').classList.toggle('active')">
+                ☰
+            </button>
+            <ul class="main-nav-menu">
+                <li><a href="./index.html">🏠 主页</a></li>
+                <li><a href="./follow-along.html" class="active">📚 跟弹模式</a></li>
+                <li><a href="./game-mode.html">🎮 游戏模式</a></li>
+            </ul>
+        </div>
+    </nav>
+    
     <div class="container">
         <div class="header">
             <h1>🎹 跟着弹 - 零基础学习</h1>
@@ -515,10 +514,6 @@
                 <div class="piano-keyboard" id="pianoKeyboard">
                     <!-- 钢琴键将通过JavaScript生成 -->
                 </div>
-            </div>
-
-            <div class="back-home">
-                <a href="index.html">← 返回主页</a>
             </div>
         </div>
     </div>
